@@ -1,0 +1,48 @@
+Flow and transport parameters
+
+https://github.com/pypa/sampleproject/blob/master/setup.py
+- pip ist der installer für PiPY
+- virtualenv sieht wichtig aus
+- Python distutils erlaubteine Packet zu erstellen (setup.py)
+    - setuptools baut (glaube ich) drauf auf
+- https://wiki.debian.org/Python/Packaging
+
+Profiling
+=========
+
+https://pypi.python.org/pypi/memory_profiler
+https://stackoverflow.com/questions/110259/which-python-memory-profiler-is-recommended
+http://guppy-pe.sourceforge.net/#Heapy
+https://wiki.python.org/moin/MemoryUsageProfiler
+
+Debian
+======
+
+- libopenblas macht Probleme mit numpy und dem multiprocessing module. Mit
+update-alternative libblas.so.3 auf atlas umstellen, und schon funktionierts
+wieder.
+
+
+Debye-Zerlegung
+===============
+
+tau_mean - logarithmisches Mittel gewichtet mit den Chargeabilities.
+
+Fragen zur DD:
+- Wie erzeuge ich synthetische Daten?
+    -> (Multi-)Cole-Cole Modelle? Welchen Fehler/Bias bringe ich hier in Simulationen ein?
+    -> Normalverteilung von m?
+- Sensitivitätsstudien zu:
+    - Anzahl Termen
+    - Verteilung Tau (linear vs. log)
+    - Min/Max tau
+    - Regularisierungsterm
+    - tau_mean zu f_max
+- Verhalten von tau_mean zu tau_50
+- Zusammenhang von tau_man/tau_50 zu Cole-Cole tau
+    - Unter welchen Bedingungen kann man hier Relationen aufstellen?
+- Zusammenhang von m_tot/m_tot_n zu Cole-Cole m
+    - siehe oben
+- Zusammenhang zur Sensitivität
+
+

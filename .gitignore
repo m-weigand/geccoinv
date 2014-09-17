@@ -1,0 +1,7 @@
+*.pyc
+build/
+dist/
+MANIFEST
+DebyeDecomposition.egg-info
+lib/GeccoInv.egg-info/
+.ropeproject
