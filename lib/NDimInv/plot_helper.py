@@ -20,27 +20,25 @@ mpl.rcParams["lines.linewidth"] = 2.0
 mpl.rcParams["lines.markeredgewidth"] = 3.0
 mpl.rcParams["lines.markersize"] = 3.0
 mpl.rcParams["font.size"] = 12
-#mpl.rcParams['font.sans-serif'] = 'Droid Sans'
 
 # hack-around for https://github.com/matplotlib/matplotlib/pull/2012
 if(mpl.__version__ == '1.3.0'):
     pass
 else:
     mpl.rcParams['font.family'] = 'Open Sans'
-#mpl.rcParams['font.weight'] = 400
+# mpl.rcParams['font.weight'] = 400
 mpl.rcParams['mathtext.default'] = 'regular'
 
-#mpl.rcParams['font.family'] = 'Droid Sans'
+# mpl.rcParams['font.family'] = 'Droid Sans'
 
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['text.latex.unicode'] = True
 # mpl sometimes has problems with latex and unicde. If you work on utf-8, the
 # following string conversion should do the trick:
-#unicode('ä'.decode('utf-8'))
-
 
 # sans-serif fonts
-preamble = r'\usepackage{droidsans} \usepackage[T1]{fontenc} '
+# preamble = r'\usepackage{droidsans}'
+preamble = r'\usepackage[T1]{fontenc} '
 preamble += r'\usepackage{sfmath} \renewcommand{\rmfamily}{\sffamily} '
 preamble += r'\renewcommand\familydefault{\sfdefault} \usepackage{mathastext} '
 mpl.rc('text.latex', preamble=preamble)

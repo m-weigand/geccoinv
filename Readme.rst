@@ -10,6 +10,8 @@ headers of individual files for more information.
 Requirements
 ------------
 
+Latex is required for plot output.
+
 The following Python packages are required to run the Debye decomposition
 routines:
 
@@ -24,11 +26,14 @@ sphinx
 Under Debian-related linux systems, these packages can be installed using the
 command:
 
-    sudo apt-get install python2.7-numpy python2.7-matplotlib python2.7-scipy
+    sudo apt-get install python2.7-numpy python-matplotlib python2.7-scipy\
+        python-setuptools python-nose python-tornado
     sudo apt-get install python-sphinx
 
 Under Windows, the program was tested using the 'pythonxy' distribution
-(https://code.google.com/p/pythonxy/).
+(https://code.google.com/p/pythonxy/). Additionally, latex support ist required
+for all plots. The programs was tested with the Miktex distribution
+(http://www.miktex.org/).
 
 
 Installation
