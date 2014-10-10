@@ -13,7 +13,7 @@ version_short = '0.5'
 version_long = '0.5.4'
 
 if __name__ == '__main__':
-    setup(name='GeccoInv',
+    setup(name='geccoinv',
           version=version_long,
           description='Multi dimensional geophysical inversion framework',
           author='Maximilian Weigand',
