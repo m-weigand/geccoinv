@@ -40,10 +40,10 @@ debugging purposes and testing of new functionality.
 The aim of the *NDimInv* class is to provide a flexible inversion framework for
 the implementation of specific inversion problems. As such it is not meant to
 be used directly to fit data to a model. Here a specific user interface should
-be implemented (i.e. the debye_decomposition routine:
-:doc:`programs/dd_single`). However, another aim of the *NDimInv* class is to
-allow for a relatively easy use with the IPython Notebook (e.g. for the
-in-depth analysis of certain fitting problems)
+be implemented (i.e. the Debye decomposition routines, see documentation of
+*DD_Interfaces*). However, another aim of the *NDimInv* class is to allow for a
+relatively easy use with the IPython Notebook (e.g. for the in-depth analysis
+of certain fitting problems)
 
 A typical inversion consists of the following steps:
 
@@ -60,9 +60,7 @@ A typical inversion consists of the following steps:
 
 A user interface should thus implement those steps and provide the means to
 change certain settings adapted to the specific problem. Also a clearly defined
-command line interface should be provided (again, see for example
-:doc:`programs/dd_single`)
-
+command line interface should be provided.
 
 .. _ref_data_and_model_dims:
 
