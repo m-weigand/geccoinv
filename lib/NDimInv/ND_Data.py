@@ -3,7 +3,7 @@ import data_weighting
 import sip_formats.convert as sip_converter
 
 
-class ND_Data():
+class ND_Data(object):
     """
     Data related functions
     """
@@ -11,7 +11,7 @@ class ND_Data():
         self.D = None
         self.obj = model
 
-        ##### model side ####
+        # #### model side ####
         self.D_base_dims = self.obj.get_data_base_dimensions()
         self.D_base_size = [x[1][1] for x in self.D_base_dims.items()]
         self.extra_dims = extra_dims
@@ -43,7 +43,7 @@ class ND_Data():
         for index in range(0, self.Df.size, dataset_size):
             basedata = self.Df[index:index + dataset_size]
             weightings = data_weighting.get_weighting_re_vs_im(basedata)
-            #weightings = data_weighting.get_weighting_all_to_one(basedata)
+            # weightings = data_weighting.get_weighting_all_to_one(basedata)
             errors += list(weightings)
 
         errors = np.array(errors).flatten()

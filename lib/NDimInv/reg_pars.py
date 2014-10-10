@@ -39,7 +39,7 @@ import numpy as np
 import itertools
 
 
-class Lam0_Fixed():
+class Lam0_Fixed(object):
     def __init__(self, fixed_lambda):
         self.value = fixed_lambda
 
@@ -47,7 +47,7 @@ class Lam0_Fixed():
         return self.value
 
 
-class Lam0_Easylam():
+class Lam0_Easylam(object):
     def get(self, it):
         """
         A reasonable initial value for lambda is the number of parameters.
@@ -56,7 +56,7 @@ class Lam0_Easylam():
         return nr_of_parameters
 
 
-class Lam0_AtWtWA():
+class Lam0_AtWtWA(object):
     def get(self, it):
         """
         Determine the initial lambda value based on
@@ -75,7 +75,7 @@ class Lam0_AtWtWA():
         return lam0
 
 
-class BaseLambda():
+class BaseLambda(object):
     """
     Base class for lambda (regularization parameter) function. Here we
     implement the check for lambda 0
@@ -100,7 +100,7 @@ class BaseLambda():
         return lam
 
 
-class Lcurve():
+class Lcurve(object):
     """
     Create an L-curve for a given iteration.
 

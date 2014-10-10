@@ -25,10 +25,10 @@ mpl.rcParams["font.size"] = 12
 if(mpl.__version__ == '1.3.0'):
     pass
 else:
+    pass
     mpl.rcParams['font.family'] = 'Open Sans'
-# mpl.rcParams['font.weight'] = 400
 mpl.rcParams['mathtext.default'] = 'regular'
-
+# mpl.rcParams['font.weight'] = 400
 # mpl.rcParams['font.family'] = 'Droid Sans'
 
 mpl.rcParams['text.usetex'] = True
@@ -37,13 +37,12 @@ mpl.rcParams['text.latex.unicode'] = True
 # following string conversion should do the trick:
 
 # sans-serif fonts
-# preamble = r'\usepackage{droidsans}'
-preamble = r'\usepackage[T1]{fontenc} '
-preamble += r'\usepackage{sfmath} \renewcommand{\rmfamily}{\sffamily} '
-preamble += r'\renewcommand\familydefault{\sfdefault} \usepackage{mathastext} '
-mpl.rc('text.latex', preamble=preamble)
-
-mpl.use('Agg')
+if(False):
+    preamble = r'\usepackage{droidsans}\usepackage[T1]{fontenc} '
+    preamble += r'\usepackage{sfmath} \renewcommand{\rmfamily}{\sffamily} '
+    preamble += r'\renewcommand\familydefault{\sfdefault} '
+    preamble += r'\usepackage{mathastext} '
+    mpl.rc('text.latex', preamble=preamble)
 
 import matplotlib.pyplot as plt
 plt

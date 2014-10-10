@@ -21,7 +21,6 @@ import scipy.sparse.linalg as SL
 import numpy as np
 import ND_Model
 import ND_Data
-import forward_models
 from plot_helper import *
 import reg_pars
 import helper
@@ -29,7 +28,7 @@ helper
 log = logging.getLogger(__name__)
 
 
-class RMS():
+class RMS(object):
     """
     Augment the Iteration() class with RMS computation functions
     """
@@ -99,7 +98,7 @@ class RMS():
         return part1, part2
 
 
-class SearchSteplengthParFit():
+class SearchSteplengthParFit(object):
     r"""
     Determine an optimal steplength parameter :math:`\alpha` by fitting a
     parabola through the results for :math:`\alpha \in [0, 0.5, 1]`.
@@ -192,7 +191,7 @@ class SearchSteplengthParFit():
         return x_min
 
 
-class SearchSteplength():
+class SearchSteplength(object):
     """
     Step length finder
 
@@ -270,7 +269,7 @@ class SearchSteplength():
         return best_value
 
 
-class InversionControl():
+class InversionControl(object):
     """
     This class augments the NDimInv class with inversion control functions. The
     actual inversion code can be found in the Inversion class, which augments
@@ -380,7 +379,7 @@ class InversionControl():
         return False
 
 
-class Inversion():
+class Inversion(object):
     """
     This class augments the Iteration class with the actual inversion functions
     """
@@ -515,6 +514,7 @@ class Iteration(RMS, Inversion):
         self.m = None
         self.f = None
         self.lams = None
+        self.statpars = None
 
     def plot(self, filename='iteration'):
         output_filename = "plot_"
@@ -590,19 +590,19 @@ class Iteration(RMS, Inversion):
         Aggregate statistical parameters for this iteration and return a
         dictionary
         """
-        self.stat_pars = {}
+        self.statpars = {}
         # loop over the m instances
         parsize = self.Model.M_base_dims[0][1]
         for nr, index in enumerate(range(0, self.m.size, parsize)):
             one_parset = self.m[index: index + parsize]
             single_par_stats = self.Model.obj.compute_par_stats(one_parset)
-            # now sort into self.stat_pars
+            # now sort into self.statpars
             for key, item in single_par_stats.iteritems():
-                if(key not in self.stat_pars):
-                    self.stat_pars[key] = []
-                self.stat_pars[key].append(item)
+                if(key not in self.statpars):
+                    self.statpars[key] = []
+                self.statpars[key].append(item)
 
-        return self.stat_pars
+        return self.statpars
 
     def plot_reg_strengths1(self, ax1, ax2):
         r"""
@@ -759,7 +759,7 @@ class NDimInv(InversionControl):
       self.D
 
     """
-    def __init__(self, model_name, settings):
+    def __init__(self, model, settings):
         # call __init__ function of the InversionControl class
         InversionControl.__init__(self)
 
@@ -767,7 +767,7 @@ class NDimInv(InversionControl):
         self.Model = None
         self.settings = settings
         self._check_settings()
-        self.model = forward_models.get(model_name, settings)
+        self.model = model
 
         # #### extra dimensions #####
         # extra dimensions both are associated with the data and the model

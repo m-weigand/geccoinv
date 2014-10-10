@@ -4,7 +4,7 @@ Template class for models
 import numpy as np
 
 
-class model_template():
+class model_template(object):
 
     def __init__(self):
         """

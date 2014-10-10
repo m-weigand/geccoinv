@@ -4,7 +4,7 @@ TODO: General concept description of ND_Model here
 import numpy as np
 
 
-class ND_Model():
+class ND_Model(object):
     """
     For the model side we need to know some things about the underlying
     model. Here we use the Debye-Decomposition routines

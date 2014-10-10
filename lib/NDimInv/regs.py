@@ -6,7 +6,7 @@ import numpy as np
 import scipy.sparse as sparse
 
 
-class DifferenceWeighting():
+class DifferenceWeighting(object):
     """
     Implement a difference weighting scheme, e.g. to weight the regularization
     matrix with time differences
@@ -32,7 +32,7 @@ class DifferenceWeighting():
         return C
 
 
-class BaseRegularization():
+class BaseRegularization(object):
     """
     Inherit all regularizations from this class
     """
