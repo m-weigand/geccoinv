@@ -17,19 +17,30 @@ GeccoInv
 Introduction
 ============
 
-[introduce GeccoInv here]
+GeccoInv is a pure python implentation of an n-dimensional Tikhonov-inversion
+scheme. It was primarily built for the implementation of the Debye
+decomposition scheme to describe electrical spectral induced polarisation (SIP)
+signatures but also be used for arbitrary inversion problems. It supports
+multiple regularisation schemes (smoothing operators of first and second order)
+and various methods of determining regularisation (:math:`\lambda`) parameters.
 
-We are always interested in your feedback and recommendations. Please use the
-bug tracker (see next paragraph) or contact us directly under
-mweigand@geo.uni-bonn.de.
+Feedback, bug reports, and general advice is always welcome. Please use the
+issue tracker on the github page for communication
+(https://github.com/m-weigand/geccoinv).  Before you report a bug make sure to
+look through the existing bugs; perhaps your problem was already reported. Also
+make sure to include all necessary information to reproduce the bug. A small
+example data set and the command line options to trigger the bug are always
+helpfull!
 
-Bugs and feature requests are managed by the bug tracker found here:
-http://testing.geo.uni-bonn.de/trac . Before you report a bug make sure to look
-through the existing bugs; perhaps your problem was already reported. Also make
-sure to include all necessary information to reproduce the bug. A small example
-data set and the command line options to trigger the bug are always helpfull!
-Please note that the bug tracker is password protected to prevent vandalism.
-Please contact mweigand@geo.uni-bonn.de for your personal access information.
+Design Overview
+===============
+
+:doc:`design_overview`
+
+Inversion
+=========
+
+:doc:`inversion`
 
 Copyright
 =========
@@ -93,15 +104,6 @@ Windows
  * For a complete Python distribution, use Python(x,y) 2.7.x
    (https://code.google.com/p/pythonxy/)
 
-Design Overview
-===============
-
-:doc:`design_overview`
-
-Inversion
-=========
-
-:doc:`inversion`
 
 .. _ref_build_your_own_inversion:
 

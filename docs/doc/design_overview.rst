@@ -1,11 +1,9 @@
 Design Overview
 ===============
 
-The aim of this project is to implement a framework for the multi dimensional
-inversion of multi-frequency complex resistivity data. However, the core
-interface was implemented to accomodate arbitrary data and model parameters.
-This should allow the use of this framework for other purposes, e.g. the
-imaging of single frequency complex resistivity data.
+The core interface is implemented to accomodate arbitrary data and model
+parameters.  This should allow the use of this framework for other purposes,
+e.g. the imaging of single frequency complex resistivity data.
 
 The use of arbitrary dimensions allows the implementation of e.g.
 time-regularization or even space-time regularization. In addition, multiple
@@ -14,7 +12,7 @@ regularization functions be registered for each dimension.
 The inversion is implemented as a real valued inversion which collapses all
 dimensions prior to the inversion step. However, regularization matrices are
 formulated for the one-dimensional problem (e.g. frequency regularization), and
-than propagated to dimensions (see :doc:`inversion`).
+than mapped to the requested dimensions (see :doc:`inversion`).
 
 .. blockdiag::
 
