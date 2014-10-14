@@ -1,10 +1,11 @@
 """
-Template class for models
+Forward model for the exponentation function
+:math:`f(a, b, \underline{x}) = a \cdot exp(b * \underline{x})`
 """
 import numpy as np
 
 
-class line(object):
+class exp_model(object):
 
     def __init__(self, settings):
         """

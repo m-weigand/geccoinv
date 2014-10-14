@@ -33,12 +33,6 @@ class RMS(object):
     Augment the Iteration() class with RMS computation functions
     """
 
-    # register rms values in this dict
-    """
-    True: sum axis
-    False: do not sum axis
-    """
-
     @property
     def rms_values(self):
         # def compute_rms(self):
@@ -539,10 +533,26 @@ class Iteration(RMS, Inversion):
         Model : Model object
         rms_types : dict defining the rms types to be computed
         """
+
+        """
+        register rms values in this dict. For each rms value, add an list
+        containing bools for each dimension of D. True denotes dimensions that
+        are summed up for the rms value, and False denotes dimensions, along
+        which rms values will be computed for each entry. It is advisable to
+        only set one dimension to False.
+        Missing entries in the list are automatically filled with True-values,
+        i.e. they are summed up. Thus, an empy list denotes the rms of all data
+        values.
+
+        Examples:
+            self.rms_types['rms_all'] = []
+            self.rms_types['rms_re_im'] = [True, False]
+        """
         self.rms_types = rms_types
         self.nr = nr
         self.Data = Data
         self.Model = Model
+
         # the following parameters will be set during the inversion process
         self.m = None
         self.f = None

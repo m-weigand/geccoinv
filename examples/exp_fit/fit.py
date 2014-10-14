@@ -13,7 +13,6 @@ from NDimInv.plot_helper import *
 
 class plot_iteration(object):
     def plot(self, it, filename):
-        print 'filename', filename
         fig, ax = plt.subplots(1, 1)
         ax.plot(it.Data.obj.settings['x'], it.Model.f(it.m), '-',
                 label='iteration')
@@ -36,7 +35,7 @@ if __name__ == '__main__':
     # fit
     forward_settings = {'x': x}
     inversion_settings = {'max_iterations': 10}
-    forward = model.line(forward_settings)
+    forward = model.exp_model(forward_settings)
     ND = NDimInv.NDimInv(forward, inversion_settings)
     ND.finalize_dimensions()
     ND.Data.add_data(y, None, extra=[])
