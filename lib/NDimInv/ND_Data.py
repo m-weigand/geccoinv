@@ -1,6 +1,5 @@
 import numpy as np
 import data_weighting
-import sip_formats.convert as sip_converter
 
 
 class ND_Data(object):
@@ -11,6 +10,8 @@ class ND_Data(object):
         self.D = None
         self.obj = model
 
+        self.data_converter = None
+
         # #### model side ####
         self.D_base_dims = self.obj.get_data_base_dimensions()
         self.D_base_size = [x[1][1] for x in self.D_base_dims.items()]
@@ -20,12 +21,32 @@ class ND_Data(object):
         # extra dimensional mask
         self.extra_mask = None
 
-    def _check_extra_size(self, extra):
+    def _check_position_with_dimensions(self, extra_position):
         """
-        Check if the requested position lies within the registered extra
+        Check if the provided position lies within the registered extra
         dimensional space
+
+        Parameters
+        ----------
+        extra_position : list/tuple of extra dimensions. If no extra dimensions
+                         are used, None has to be used.
         """
-        for index, dimension in enumerate(extra):
+        # are there any extra dimensions?
+        if(len(extra_position) == 0):
+            if (len(self.extra_dims) == 0):
+                return
+            else:
+                raise TypeError('We expect no extra dimensions')
+
+        # correspond the number of extra dimensions?
+        position_dims = len(extra_position) - 1
+        if(position_dims not in self.extra_dims):
+            raise TypeError(
+                'The position requests more dimensions than were previously' +
+                'registered')
+
+        # are the requested indices located within the boundaries?
+        for index, dimension in enumerate(extra_position):
             if(self.extra_dims[index][1] < (dimension + 1)):
                 raise IOError('Requested extra dimensional position {0} ' +
                               'lies outside of registered size'.format(index))
@@ -109,17 +130,17 @@ class ND_Data(object):
                 space for the data set. Use None if no extra dimensions are
                 use.
         """
-        data_converted = sip_converter.convert(data_format,
-                                               self.obj.data_format, data)
+        if(self.data_converter is not None):
+            data_converted = self.data_converter(
+                data_format, self.obj.data_format, data)
+        else:
+            data_converted = data
 
         # allocate D if we didn't do it yet
         self._allocate_D()
 
         # check dimensions with self.D_extra_dims
         self._check_position_with_dimensions(extra)
-
-        # check extra size
-        self._check_extra_size(extra)
 
         # update value nrs if appropriate
         for nr, dimension in enumerate(extra):
@@ -137,25 +158,3 @@ class ND_Data(object):
         index = tuple(index)
 
         self.D[index] = data_converted
-
-    def _check_position_with_dimensions(self, position):
-        """
-        Check if the provided position lie within the registered extra
-        dimensional space
-
-        Parameters
-        ----------
-        position : list/tuple of extra dimensions. If no extra dimensions are
-                   used, None has to be used.
-        """
-        if(len(position) == 0):
-            if (len(self.extra_dims) == 0):
-                return
-            else:
-                raise TypeError('We expect no extra dimensions')
-
-        position_dims = len(position) - 1
-        if(position_dims not in self.extra_dims):
-            raise TypeError(
-                'The position requests more dimensions than were previously' +
-                'registered')
