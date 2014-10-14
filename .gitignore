@@ -4,4 +4,5 @@ dist/
 MANIFEST
 DebyeDecomposition.egg-info
 lib/GeccoInv.egg-info/
+lib/geccoinv.egg-info/
 .ropeproject

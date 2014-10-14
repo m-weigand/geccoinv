@@ -1,6 +1,6 @@
 import logging
-from .main import NDimInv as Inversion
+from .main import NDimInv
 
-all = [Inversion, ]
+all = [NDimInv, ]
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())

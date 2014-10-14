@@ -159,11 +159,11 @@ class Lcurve(object):
                 print('Test lambda: ', test_lam)
                 test_it = it.copy()
                 test_lams[lam_index] = test_lam
-                #update_m = test_it._model_update((test_lam, ), (WtWm, ))
+                # update_m = test_it._model_update((test_lam, ), (WtWm, ))
                 update_m = test_it._model_update(test_lams, WtWms)
 
                 # we could select an optimal alpha value here
-                #alpha = self.Model.steplength_selector.get_steplength(
+                # alpha = self.Model.steplength_selector.get_steplength(
                 #   self, update_m)
                 alpha = 1
                 test_it.m = it.m + alpha * update_m
@@ -189,7 +189,7 @@ class Lcurve(object):
         selection functions, although not yet implemented to return an optimal
         lambda value.
         """
-        #rms_values, test_Rm, test_lams = self._sample_lambdas(it, WtWm,
+        # rms_values, test_Rm, test_lams = self._sample_lambdas(it, WtWm,
         #                                                      lam_index)
         # now find the optimal lambda values and return it
         return None
@@ -239,7 +239,7 @@ class SearchLambdaIndividual(BaseLambda):
             it_indiv.m = M[tuple(m_slice)]
             it_indiv.f = it.Model.f(it_indiv.m)
 
-            ## find optimal lambda for this iteration
+            # # find optimal lambda for this iteration
             if(type(old_lam) is float or type(old_lam) is int):
                 lam_old_individual = old_lam
             else:
@@ -262,7 +262,7 @@ class SearchLambda(BaseLambda):
     """
     Test multiple lambda values for an optimal rms decrease
     """
-    def __init__(self, lam0_obj):
+    def __init__(self, lam0_obj, rms_key='rms_all', rms_index=0):
         """
         Parameters
         ----------
@@ -270,7 +270,8 @@ class SearchLambda(BaseLambda):
         """
         self.lam0_obj = lam0_obj
         # which rms key to use for optimization
-        self.rms_key = 'rms_part2_no_err'
+        self.rms_key = rms_key
+        self.rms_index = rms_index
 
     def _get_lambda(self, it, WtWm, old_lam):
         """
@@ -310,7 +311,7 @@ class SearchLambda(BaseLambda):
                 # check if all steplengths lead to errors
                 if(alpha is None):
                     continue
-                #alpha = 1
+                # alpha = 1
                 test_it.m = it.m + alpha * update_m
                 test_it.f = test_it.Model.f(test_it.m)
 
@@ -324,7 +325,8 @@ class SearchLambda(BaseLambda):
                 continue
 
         # aggregate all RMS values
-        rms_values = [x.rms_values[self.rms_key] for x in test_its]
+        rms_values = [x.rms_values[self.rms_key][self.rms_index]
+                      for x in test_its]
 
         minimal_lambda_index = np.argmin(rms_values)
         best_lam = test_lams[minimal_lambda_index]

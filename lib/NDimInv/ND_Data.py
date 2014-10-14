@@ -16,6 +16,11 @@ class ND_Data(object):
         self.D_base_dims = self.obj.get_data_base_dimensions()
         self.D_base_size = [x[1][1] for x in self.D_base_dims.items()]
         self.extra_dims = extra_dims
+
+        self.dimensions = self.D_base_dims.copy()
+        for key, item in self.extra_dims.iteritems():
+            self.dimensions[key + len(self.D_base_size)] = item
+
         self._base_length = None
 
         # extra dimensional mask

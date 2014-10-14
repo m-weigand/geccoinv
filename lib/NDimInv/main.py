@@ -32,8 +32,37 @@ class RMS(object):
     """
     Augment the Iteration() class with RMS computation functions
     """
+
+    # register rms values in this dict
+    """
+    True: sum axis
+    False: do not sum axis
+    """
+
     @property
     def rms_values(self):
+        # def compute_rms(self):
+        D = self.Data.D
+        F = self.Model.F(self.Model.convert_to_M(self.m))
+        diff = (D - F) ** 2
+        # Wd = self.Data.Wd
+
+        rms_values = {}
+        for key, item in self.rms_types.iteritems():
+            # determine which dimensions to sum up
+            full_item = np.array(item + [True, ] * (len(D.shape) - len(item)))
+            indices = np.where(full_item)[0]
+            # remaining = np.where(~full_item)[0]
+
+            rms_sum = np.sum(diff, axis=tuple(indices))
+            N = np.prod([diff.shape[x] for x in indices])
+            rms = np.atleast_1d(np.sqrt(rms_sum / N))
+            rms_values[key] = rms
+            # print key, 'RMS', rms, N
+        return rms_values
+
+    @property
+    def old_rms_values(self):
         r"""
         Compute the rms values for the first part (usually real part or
         magnitude), the second part (usually imaginary part or phase), and both
@@ -108,18 +137,14 @@ class SearchSteplengthParFit(object):
 
     By default we optimize the rms called 'rms_part2_no_err'
     """
-    def __init__(self, optimize='rms_part2_no_err'):
+    def __init__(self, optimize='rms_all', optimize_index=0):
         """
         Parameters
         ----------
-        optimize : which rms to optimize (default: part2):
-                   'part1' : optimize the first part of the data vector
-                             (usually real part or magnitude)
-                   'part2': optimize the second part of the data vector
-                             (usually imaginary part or phase)
-                   'both': optimize the rms value of all data points
+        optimize : which rms to optimize (default: all):
         """
-        self.rms_index = optimize
+        self.rms_key = optimize
+        self.rms_index = optimize_index
 
     def get_steplength(self, it, par_update, ignore_all_err=False):
         """
@@ -131,7 +156,7 @@ class SearchSteplengthParFit(object):
         rms_values = []
         alpha_values = []
 
-        rms_values.append(old_rms[self.rms_index])
+        rms_values.append(old_rms[self.rms_key][self.rms_index])
         alpha_values.append(0)
 
         for nr, test_alpha in enumerate((0.5, 1)):
@@ -140,7 +165,7 @@ class SearchSteplengthParFit(object):
             it_test.m = m_test
             try:
                 test_rms = it_test.rms_values
-                rms_values.append(test_rms[self.rms_index])
+                rms_values.append(test_rms[self.rms_key][self.rms_index])
                 alpha_values.append(test_alpha)
             except FloatingPointError:
                 pass
@@ -176,6 +201,8 @@ class SearchSteplengthParFit(object):
         if(False):
             fig, ax = plt.subplots(1, 1)
             ax.plot(x, y, '.')
+            ax.set_xlabel('alpha')
+            ax.set_label('rms')
             x_dense = np.linspace(0, 1, 30)
             ax.plot(x_dense, a * (x_dense ** 2) + b * x_dense + c, '-')
             ax.axvline(x_min)
@@ -277,12 +304,13 @@ class InversionControl(object):
     """
     def __init__(self):
         self.iterations = []
+        self.rms_types = {'rms_all': []}
 
     def start_inversion(self):
         """
         Initialize the inversion
         """
-        it = Iteration(0, self.Data, self.Model)
+        it = Iteration(0, self.Data, self.Model, self.rms_types)
         # starting model
         it.m = self.Model.m0
         it.f = self.Model.f(it.m)
@@ -328,11 +356,12 @@ class InversionControl(object):
 
         # which rms to use
         # TODO: Should be changeable by the user
-        rms_index = 'rms_part2_no_err'  # imaginary part/phase
+        rms_key = 'rms_all'  # imaginary part/phase
+        rms_index = 0
         #
         nr = self.iterations[-1].nr
-        old_rms = self.iterations[-1].rms_values[rms_index]
-        new_rms = new_it.rms_values[rms_index]
+        old_rms = self.iterations[-1].rms_values[rms_key][rms_index]
+        new_rms = new_it.rms_values[rms_key][rms_index]
 
         # if we are in the first iteration, then we allow a slight increase in
         # the imaginary RMS, but not above a certain threshold
@@ -365,7 +394,7 @@ class InversionControl(object):
         No stopping criteria are evaluated.
         """
         for i in range(0, n):
-            new_iteration = self.iterations[-1].next_iteration()
+            new_iteration, stop_now = self.iterations[-1].next_iteration()
             self.iterations.append(new_iteration)
             # self.iterations[-1].plot()
 
@@ -394,7 +423,8 @@ class Inversion(object):
         stop_now : if something goes wrong with the next iteration, return
                    False here an the inversion is stopped
         """
-        new_iteration = Iteration(self.nr + 1, self.Data, self.Model)
+        new_iteration = Iteration(self.nr + 1, self.Data, self.Model,
+                                  self.rms_types)
 
         lams, WtWms = self.Model.retrieve_lams_and_WtWms(self)
         new_iteration.lams = lams
@@ -500,13 +530,16 @@ class Iteration(RMS, Inversion):
     """
     This class holds all information of one iteration
     """
-    def __init__(self, nr, Data, Model):
+    def __init__(self, nr, Data, Model, rms_types):
         """
         Parameters
         ----------
+        nr : iteration nr
         Data : Data object
         Model : Model object
+        rms_types : dict defining the rms types to be computed
         """
+        self.rms_types = rms_types
         self.nr = nr
         self.Data = Data
         self.Model = Model
@@ -575,7 +608,7 @@ class Iteration(RMS, Inversion):
         self.Data/self.Model will only be copied by reference. Thus if you
         change them here they will be changed everywhere.
         """
-        it_copy = Iteration(self.nr, self.Data, self.Model)
+        it_copy = Iteration(self.nr, self.Data, self.Model, self.rms_types)
 
         # copy all variables
         it_copy.m = self.m
