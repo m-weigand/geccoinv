@@ -2,6 +2,7 @@
 TODO: General concept description of ND_Model here
 """
 import numpy as np
+import itertools
 
 
 class ND_Model(object):
@@ -128,7 +129,7 @@ class ND_Model(object):
         size_x = new_2d_shape[0] * new_2d_shape[1]
         Wm_large = np.zeros((size_x, size_x))
 
-        ## compute steps for each dimension
+        # # compute steps for each dimension
         # a step is the number of entries in the flattened version of the
         # parameter array which we have to skip in order to get the "neighbour"
         # of this regularization dimension
@@ -288,10 +289,43 @@ class ND_Model(object):
         # loop over the spectra of all dimensions
         for index in range(0, m.size, step_size):
             pars = m[index: index + step_size]
-            part1_2 = self.obj.forward(pars)
-            response_list.append(part1_2)
+            forward = self.obj.forward(pars).flatten(order='F')
+            response_list.append(forward)
         response = np.array(response_list).flatten()
         return response
+
+    def F(self, M):
+        r"""Return the mode responses in the same dimensionality as D, i.e.
+        [base_dimensions, extra_dimensions].
+
+        TODO: Any way to do this without the loop/product thingy?
+        """
+        F = np.zeros_like(self.Data.D)
+
+        # assemble all possible extra dimension-indices
+        # this corresponds to a for loop for each extra dimension
+        """Example:
+            Given are two extra dimensions:
+                for i in range(0, size_extra_dim_0):
+                    for j in range(0, size_extra_dim_1):
+                        print (i, j)
+        """
+        all_indices = [range(0, x[1][1]) for x in self.extra_dims.iteritems()]
+        extra_indices = itertools.product(*all_indices)
+        # create slices for the base dimensions, corresponds to a list of ':'
+        # for each base dimension in M or D
+        M_base_indices = [slice(0, x[1][1]) for x in self.M_base_dims.items()]
+        D_base_indices = [slice(0, x[1][1]) for x in
+                          self.Data.D_base_dims.items()]
+
+        # compute and save the forward responses
+        for index in extra_indices:
+            sl = tuple(M_base_indices + list(index))
+            st = tuple(D_base_indices + list(index))
+            # one model
+            m_tiny = M[sl]
+            F[st] = self.obj.forward(m_tiny)
+        return F
 
     def J(self, m):
         """

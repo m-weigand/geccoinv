@@ -778,13 +778,11 @@ class NDimInv(InversionControl):
         """
         Check if all required settings were made
         """
-        required_settings = ('Nd',
-                             'frequencies',
-                             'tausel',
-                             'max_iterations')
+        required_settings = ('max_iterations', )
         for requirement in required_settings:
             if(requirement not in self.settings):
-                print('Missing required setting {0}'.format(requirement))
+                print('NDimInv: Missing required setting {0}'.format(
+                    requirement))
                 exit()
 
     def finalize_dimensions(self):
