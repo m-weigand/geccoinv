@@ -15,6 +15,7 @@ class exp_model(object):
         self.data_format = "rre_rmim"
 
     def estimate_starting_parameters(self, part1, part2):
+        # return startin parameter a, b
         return [1.0, 1.5]
 
     def set_settings(self, settings):
@@ -28,9 +29,7 @@ class exp_model(object):
         Return the forward response as a flattened version of all base
         dimensions
         """
-        print 'PARS', pars
         y = pars[0] * np.exp(self.settings['x'] * pars[1])
-        print 'Y', y
         return y
 
     def Jacobian(self, pars):

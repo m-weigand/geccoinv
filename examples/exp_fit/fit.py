@@ -30,6 +30,7 @@ if __name__ == '__main__':
     # generate data to be fitted
     x = np.arange(1, 2, 0.05)
     y = 2.0 * np.exp(x * 2.0)
+    np.random.seed(5)
     y += np.random.uniform(0, 5, x.size)
 
     # fit

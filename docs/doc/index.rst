@@ -6,7 +6,7 @@
 .. toctree::
     :hidden:
 
-    tutorial_dd_ndiminv
+    tutorial1
     design_overview
     inversion
 
@@ -36,6 +36,11 @@ Design Overview
 ===============
 
 :doc:`design_overview`
+
+Build you own inversion
+=======================
+
+:doc:`tutorial1`
 
 Inversion
 =========
@@ -106,11 +111,6 @@ Windows
 
 
 .. _ref_build_your_own_inversion:
-
-Build you own inversion
-=======================
-
-:doc:`tutorial_dd_ndiminv`
 
 Long-term Todo
 ==============
