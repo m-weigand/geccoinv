@@ -12,7 +12,7 @@ class model_template(object):
         """
         self.data_format = "rre_rmim"
 
-    def estimate_starting_parameters_1(self, part1, part2):
+    def estimate_starting_parameters(self, part1, part2):
         pass
         # return format?
 
@@ -35,6 +35,11 @@ class model_template(object):
 
     def Jacobian(self, pars):
         pass
+
+    def get_data_base_size(self):
+        size = sum([x[1][1] for x in
+                    self.get_data_base_dimensions().iteritems()])
+        return size
 
     def get_data_base_dimensions(self):
         """
