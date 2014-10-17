@@ -60,9 +60,6 @@ class model_template(object):
         M_base_dims = {0: ['rho0_mi', self.tau.size + 1]}
         return M_base_dims
 
-    def check_data(self, part1, part2):
-        return True
-
     def compute_par_stats(self, pars):
         """
         For a given parameter set (i.e. a fit result), compute relevant

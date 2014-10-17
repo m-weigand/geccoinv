@@ -60,9 +60,6 @@ class exp_model(object):
         M_base_dims = {0: ['pars', 2]}
         return M_base_dims
 
-    def check_data(self, part1, part2):
-        return True
-
     def compute_par_stats(self, pars):
         """
         For a given parameter set (i.e. a fit result), compute relevant
