@@ -1,7 +1,6 @@
 """
 Template class for models
 """
-import numpy as np
 
 
 class model_template(object):
@@ -12,7 +11,7 @@ class model_template(object):
         """
         self.data_format = "rre_rmim"
 
-    def estimate_starting_parameters(self, part1, part2):
+    def estimate_starting_parameters(self, base_data):
         pass
         # return format?
 
@@ -21,10 +20,6 @@ class model_template(object):
         Set the settings and call necessary functions
         """
         self.settings = settings
-
-        # extract some variables
-        self.frequencies = self.settings['frequencies']
-        self.omega = 2.0 * np.pi * self.frequencies
 
     def forward(self, pars):
         """
@@ -37,6 +32,8 @@ class model_template(object):
         pass
 
     def get_data_base_size(self):
+        """ usually you do not need to modify this
+        """
         size = sum([x[1][1] for x in
                     self.get_data_base_dimensions().iteritems()])
         return size

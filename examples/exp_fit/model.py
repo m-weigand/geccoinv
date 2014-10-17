@@ -12,9 +12,9 @@ class exp_model(object):
 
         """
         self.settings = settings
-        self.data_format = "rre_rmim"
+        self.data_format = "x"
 
-    def estimate_starting_parameters(self, part1, part2):
+    def estimate_starting_parameters(self, base_data):
         # return startin parameter a, b
         return [1.0, 1.5]
 

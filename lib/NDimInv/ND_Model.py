@@ -46,6 +46,8 @@ class ND_Model(object):
         >>>     self.Data.D[d]
         >>>     self.M[m]
 
+        This function provides the slices in the same order as an oder='F'
+        argument for .flatten().
         """
         all_indices = [range(0, x[1][1]) for x in self.extra_dims.iteritems()]
         extra_indices = itertools.product(*all_indices)
@@ -289,13 +291,8 @@ class ND_Model(object):
         Compute starting parameters for all spectra in the Data object
         """
         m0_list = []
-        step_size = self.Data.base_length
-        Df = self.Data.Df
-        for index in range(0, Df.size, step_size):
-            parts1_and_2 = Df[index: index + step_size]
-            part1 = parts1_and_2[0: parts1_and_2.size / 2]
-            part2 = parts1_and_2[parts1_and_2.size / 2:]
-            m0 = self.obj.estimate_starting_parameters(part1, part2)
+        for d_slice, m_slice in self.DM_iterator():
+            m0 = self.obj.estimate_starting_parameters(self.Data.D[d_slice])
             m0_list.append(m0)
 
         self.m0 = np.array(m0_list).flatten()
