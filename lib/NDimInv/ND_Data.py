@@ -1,4 +1,5 @@
 import numpy as np
+import itertools
 import data_weighting
 
 
@@ -57,7 +58,7 @@ class ND_Data(object):
                               'lies outside of registered size'.format(index))
 
     @property
-    def Wd(self):
+    def Wd_old(self):
         """
         Compute data weighting matrix. This matrix is solely dependent on the
         input data
@@ -70,9 +71,52 @@ class ND_Data(object):
             basedata = self.Df[index:index + dataset_size]
             weightings = data_weighting.get_weighting_re_vs_im(basedata)
             # weightings = data_weighting.get_weighting_all_to_one(basedata)
+            # weightings = data_weighting.get_weighting_rel_abs(basedata)
             errors += list(weightings)
 
         errors = np.array(errors).flatten()
+        Wd = np.diag(errors)
+        return Wd
+
+    def D_iterator(self):
+        """
+        Generator for base_dimensional chunks of D, i.e. iterate over all
+        extra dimensions of both D.
+
+        Use as:
+
+        >>> for d, in self.D_iterator():
+        >>>     self.Data.D[d]
+
+        This function provides the slices in the same order as an oder='F'
+        argument for .flatten().
+        """
+        all_indices = [range(0, x[1][1]) for x in self.extra_dims.iteritems()]
+        extra_indices = itertools.product(*all_indices)
+
+        # create slices for the base dimensions, corresponds to a list of ':'
+        # for each base dimension in M or D
+        D_base_indices = [slice(0, x[1][1]) for x in
+                          self.D_base_dims.items()]
+
+        # compute and save the forward responses
+        for index in extra_indices:
+            sd = tuple(D_base_indices + list(index))
+            yield sd
+
+    def WD(self):
+        """
+
+        """
+        WD = np.zeros_like(self.D)
+        for slice_d in self.D_iterator():
+            weightings = data_weighting.get_weighting_re_vs_im(self.D[slice_d])
+            WD[slice_d] = weightings
+        return WD
+
+    @property
+    def Wd(self):
+        errors = self.WD().flatten(order='F')
         Wd = np.diag(errors)
         return Wd
 

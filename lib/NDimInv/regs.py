@@ -25,7 +25,7 @@ class DifferenceWeighting(object):
         """
         diff = np.diff(self.data)
         weighting_factors = 1 / np.sqrt(diff)
-        #weighting_factors = 1 / (diff)
+        # weighting_factors = 1 / (diff)
 
         C = np.diag(weighting_factors)
         C = sparse.csc_matrix(C)
@@ -66,7 +66,6 @@ class Damping(BaseRegularization):
     """
     def Wm(self, parsize):
         Wm = np.identity(parsize)
-        print Wm.shape, 'wmshape'
         # remove last row
         # Wm = Wm[0:-1, :]
         if(self.decouple is not None):

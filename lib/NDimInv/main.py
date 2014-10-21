@@ -19,6 +19,7 @@ import logging
 import scipy.sparse as sparse
 import scipy.sparse.linalg as SL
 import numpy as np
+import json
 import ND_Model
 import ND_Data
 from plot_helper import *
@@ -28,6 +29,56 @@ helper
 log = logging.getLogger(__name__)
 
 
+class RMS_control(object):
+    """Manage RMS definitions and names. Inherited by NDimInv
+
+    Register rms values in the dict self.rms_types. For each rms value, add an
+    list containing bools for each dimension of D. True denotes dimensions that
+    are summed up for the rms value, and False denotes dimensions, along which
+    rms values will be computed for each entry. It is advisable to only set one
+    dimension to False.
+    Missing entries in the list are automatically filled with True-values,
+    i.e. they are summed up. Thus, an empy list denotes the rms of all data
+    values.
+
+    Examples:
+
+    >>> self.rms_types['rms_all'] = []
+    >>> self.rms_types['rms_re_im'] = [True, False]
+    """
+    def __init__(self):
+        # default rms over all data points
+        self.rms_types = {'rms_all': []}
+        self.rms_names = {'rms_all': ['rms_all', ]}
+
+    def add_rms(self, key, definition, names):
+        """register a new rms value
+
+        Parameters
+        ----------
+        key: internal key for this rms
+        definition: rms definition, see class documentation
+        names: a list of names corresponding to the rms values. The list has
+               either only one entry for all rms values (numbers will be added
+               automatically), or the length must match the number of resulting
+               rms values.
+        """
+        if key in self.rms_types:
+            print('WARNING: Duplicate RMS definition: {0}'.format(key))
+        self.rms_types[key] = definition
+        self.rms_names[key] = names
+
+    def save_rms_definition(self, filename):
+        # prepare a tuple containing both rms dicts
+        rms_definition = (self.rms_types, self.rms_names)
+        with open(filename, 'w') as fid:
+            json.dump(rms_definition, fid)
+
+    def load_rms_definition(self, filename):
+        with open(filename, 'r') as fid:
+            self.rms_types, self.rms_names = json.load(fid)
+
+
 class RMS(object):
     """
     Augment the Iteration() class with RMS computation functions
@@ -35,24 +86,43 @@ class RMS(object):
 
     @property
     def rms_values(self):
-        # def compute_rms(self):
+        r"""Compute RMS values based on the definitions in self.rms_values.
+        Two RMS values are computed:
+
+        .. math::
+
+            RMS_{error} = \sqrt{\frac{1}{N} \sum_{i} \left( \frac{d_i -
+                f_i}{\epsilon_i} \right)^2}
+
+            RMS_{no~error} = \sqrt{\frac{1}{N} \sum_{i} \left(\frac{d_i -
+                f_i}{1} \right)^2}
+
+        RMS values without errors included are prepended with the string
+        "_noerr", and with errors the string '_error' is added.
+        """
         D = self.Data.D
         F = self.Model.F(self.Model.convert_to_M(self.m))
-        diff = (D - F) ** 2
-        # Wd = self.Data.Wd
+        diff = (D - F)
+
+        WD = self.Data.WD()
+        diff_err = diff * WD
+
+        diff_sq = diff ** 2
+        diff_err_sq = diff_err ** 2
 
         rms_values = {}
-        for key, item in self.rms_types.iteritems():
+        for key, item in self.RMS.rms_types.iteritems():
             # determine which dimensions to sum up
             full_item = np.array(item + [True, ] * (len(D.shape) - len(item)))
             indices = np.where(full_item)[0]
             # remaining = np.where(~full_item)[0]
 
-            rms_sum = np.sum(diff, axis=tuple(indices))
-            N = np.prod([diff.shape[x] for x in indices])
-            rms = np.atleast_1d(np.sqrt(rms_sum / N))
-            rms_values[key] = rms
-            # print key, 'RMS', rms, N
+            for full_key, diff in zip((key + '_error', key + '_noerr'),
+                                      (diff_err_sq, diff_sq)):
+                rms_sum = np.sum(diff, axis=tuple(indices))
+                N = np.prod([diff.shape[x] for x in indices])
+                rms = np.atleast_1d(np.sqrt(rms_sum / N))
+                rms_values[full_key] = rms
         return rms_values
 
     @property
@@ -67,8 +137,8 @@ class RMS(object):
         Returns
         -------
         rms_values : dict containing the following keys (
-                     rms_part1_no_err, rms_part2_no_err, rms_both_no_err,
-                     rms_part1_err, rms_part2_err, rms_both_err)
+                     rms_part1_noerr, rms_part2_noerr, rms_both_noerr,
+                     rms_part1_error, rms_part2_error, rms_both_error)
 
         """
         d = self.Data.Df
@@ -92,7 +162,7 @@ class RMS(object):
             except FloatingPointError:
                 rms = np.inf
 
-            rms_values_ng['rms_' + name + '_no_err'] = rms
+            rms_values_ng['rms_' + name + '_noerr'] = rms
 
             try:
                 rms_err = np.sum(Wd[Wslice, Wslice].dot(diff) ** 2)
@@ -101,7 +171,7 @@ class RMS(object):
             except FloatingPointError:
                 rms_err = np.inf
 
-            rms_values_ng['rms_' + name + '_err'] = rms_err
+            rms_values_ng['rms_' + name + '_error'] = rms_err
 
             rms_values.append(rms)
         return rms_values_ng
@@ -129,9 +199,9 @@ class SearchSteplengthParFit(object):
     This procedure needs only two calculations of the model update
     (:math:`\alpha = [0.5, 1]`).
 
-    By default we optimize the rms called 'rms_part2_no_err'
+    By default we optimize the rms called 'rms_all_noerr'
     """
-    def __init__(self, optimize='rms_all', optimize_index=0):
+    def __init__(self, optimize='rms_all_noerr', optimize_index=0):
         """
         Parameters
         ----------
@@ -218,18 +288,14 @@ class SearchSteplength(object):
 
     Check a list of fixed alpha values for the optimal value
     """
-    def __init__(self, fixed_values=None, optimize='rms_part2_no_err'):
+    def __init__(self, fixed_values=None, rms_key='rms_all_noerr', rms_index=1):
         """
         Parameters
         ----------
         fixed_values : None for default values (0.1, 0.5, 1)
                        Provide a tuple of float values to set test values
-        optimize : which rms to optimize (default: part2):
-                   'part1' : optimize the first part of the data vector
-                             (usually real part or magnitude)
-                   'part2': optimize the second part of the data vector
-                             (usually imaginary part or phase)
-                   'both': optimize the rms value of all data points
+        rms_key: RMS dict key to optimize
+        rms_index: index for the provided RMS key
         """
         if(fixed_values is None):
             # 1e-5, 1e-4
@@ -237,15 +303,16 @@ class SearchSteplength(object):
         else:
             self.values = fixed_values
 
-        self.rms_index = optimize
+        self.rms_key = rms_key
+        self.rms_index = rms_index
 
     def get_steplength(self, it, par_update, ignore_all_err=False):
         r"""
         For a given Iteration and a new model update, find an optimal step
         length parameter :math:`\alpha`
 
-        The variable self.rms_index determines the rms index to use for the
-        optimization.
+        The variables self.rms_key/self.rms_index determine the RMS to use for
+        the optimization.
 
         Note that we do not check if alpha == 0 yields optimal results, this is
         left to the stopping creteria.
@@ -271,11 +338,12 @@ class SearchSteplength(object):
 
                 if(best_index == -1):
                     best_index = nr
-                    best_rms = test_rms[self.rms_index]
+                    best_rms = test_rms[self.rms_key][self.rms_index]
                 else:
-                    if(old_rms[self.rms_index] > test_rms[self.rms_index]):
+                    if(old_rms[self.rms_key][self.rms_index] >
+                       test_rms[self.rms_key][self.rms_index]):
                         best_index = nr
-                        best_rms = test_rms[self.rms_index]
+                        best_rms = test_rms[self.rms_key][self.rms_index]
             except FloatingPointError:
                 pass
         if(best_index == -1):
@@ -285,7 +353,7 @@ class SearchSteplength(object):
 
         print('Found an optimal steplength ({0}) with rms {1} '.format(
             self.values[nr], best_rms) + '(old rms: {0})'.format(
-            old_rms[self.rms_index]))
+            old_rms[self.rms_key][self.rms_index]))
         best_value = self.values[best_index]
         return best_value
 
@@ -297,20 +365,31 @@ class InversionControl(object):
     the Iteration class.
     """
     def __init__(self):
+        super(InversionControl, self).__init__()
         self.iterations = []
-        self.rms_types = {'rms_all': []}
+        # which rms to use for stopping criteria
+        self.stop_rms_key = 'rms_all_noerr'
+        self.stop_rms_index = 0
 
-    def start_inversion(self):
+    def get_initial_iteration(self):
+        """Return a bare iteration object initialized with the starting model
+        and all registered RMS values.
         """
-        Initialize the inversion
-        """
-        it = Iteration(0, self.Data, self.Model, self.rms_types)
+        it = Iteration(0, self.Data, self.Model, self.RMS)
+
         # starting model
         it.m = self.Model.m0
         it.f = self.Model.f(it.m)
         # set lam0 values
         it.lams, _ = self.Model.retrieve_lams_and_WtWms(it)
-        self.iterations.append(it)
+        return it
+
+    def start_inversion(self):
+        """
+        Initialize the inversion
+        """
+        it0 = self.get_initial_iteration()
+        self.iterations.append(it0)
 
         # we store any additional inversion settings here
         # leave this for later use
@@ -348,14 +427,12 @@ class InversionControl(object):
         rms_upd_eps = 1e-5  # min. requested rms change between iterations
         allowed_rms_im_increase_first_iteration = 1e2
 
-        # which rms to use
-        # TODO: Should be changeable by the user
-        rms_key = 'rms_all'  # imaginary part/phase
-        rms_index = 0
         #
         nr = self.iterations[-1].nr
-        old_rms = self.iterations[-1].rms_values[rms_key][rms_index]
-        new_rms = new_it.rms_values[rms_key][rms_index]
+        old_rms = self.iterations[-1].rms_values[
+            self.stop_rms_key][self.stop_rms_index]
+        new_rms = new_it.rms_values[
+            self.stop_rms_key][self.stop_rms_index]
 
         # if we are in the first iteration, then we allow a slight increase in
         # the imaginary RMS, but not above a certain threshold
@@ -402,10 +479,13 @@ class InversionControl(object):
         return False
 
 
-class Inversion(object):
+class Inversion(RMS):
     """
     This class augments the Iteration class with the actual inversion functions
     """
+
+    def __init__(self):
+        super(Inversion, self).__init__()
 
     def next_iteration(self):
         """
@@ -418,7 +498,7 @@ class Inversion(object):
                    False here an the inversion is stopped
         """
         new_iteration = Iteration(self.nr + 1, self.Data, self.Model,
-                                  self.rms_types)
+                                  self.RMS)
 
         lams, WtWms = self.Model.retrieve_lams_and_WtWms(self)
         new_iteration.lams = lams
@@ -520,11 +600,11 @@ class Inversion(object):
         return update_m
 
 
-class Iteration(RMS, Inversion):
+class Iteration(Inversion):
     """
     This class holds all information of one iteration
     """
-    def __init__(self, nr, Data, Model, rms_types):
+    def __init__(self, nr, Data, Model, RMS):
         """
         Parameters
         ----------
@@ -533,22 +613,9 @@ class Iteration(RMS, Inversion):
         Model : Model object
         rms_types : dict defining the rms types to be computed
         """
+        super(Iteration, self).__init__()
 
-        """
-        register rms values in this dict. For each rms value, add an list
-        containing bools for each dimension of D. True denotes dimensions that
-        are summed up for the rms value, and False denotes dimensions, along
-        which rms values will be computed for each entry. It is advisable to
-        only set one dimension to False.
-        Missing entries in the list are automatically filled with True-values,
-        i.e. they are summed up. Thus, an empy list denotes the rms of all data
-        values.
-
-        Examples:
-            self.rms_types['rms_all'] = []
-            self.rms_types['rms_re_im'] = [True, False]
-        """
-        self.rms_types = rms_types
+        self.RMS = RMS
         self.nr = nr
         self.Data = Data
         self.Model = Model
@@ -618,7 +685,7 @@ class Iteration(RMS, Inversion):
         self.Data/self.Model will only be copied by reference. Thus if you
         change them here they will be changed everywhere.
         """
-        it_copy = Iteration(self.nr, self.Data, self.Model, self.rms_types)
+        it_copy = Iteration(self.nr, self.Data, self.Model, self.RMS)
 
         # copy all variables
         it_copy.m = self.m
@@ -804,13 +871,14 @@ class NDimInv(InversionControl):
     """
     def __init__(self, model, settings):
         # call __init__ function of the InversionControl class
-        InversionControl.__init__(self)
+        super(NDimInv, self).__init__()
 
         self.Data = None
         self.Model = None
         self.settings = settings
         self._check_settings()
         self.model = model
+        self.RMS = RMS_control()
 
         # #### extra dimensions #####
         # extra dimensions both are associated with the data and the model

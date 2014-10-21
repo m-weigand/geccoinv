@@ -110,7 +110,8 @@ class Lcurve(object):
     """
     def __init__(self):
         # which rms key to use for optimization
-        self.rms_key = 'rms_part2_no_err'
+        self.rms_key = 'rms_re_im_noerr'
+        self.rms_index = 1
 
     def plot_lcurve(self, it, WtWms, lams, lam_index, output_prefix):
         rms_values, test_Rm, test_lams = self._sample_lambdas(it, WtWms, lams,
@@ -179,7 +180,8 @@ class Lcurve(object):
                 continue
 
         # aggregate all RMS values
-        rms_values = [x.rms_values[self.rms_key] for x in test_its]
+        rms_values = [x.rms_values[self.rms_key][self.rms_index]
+                      for x in test_its]
 
         return rms_values, test_Rm, test_lams
 
@@ -211,7 +213,8 @@ class SearchLambdaIndividual(BaseLambda):
         """
         self.lam0_obj = lam0_obj
         # which rms key to use for optimization
-        self.rms_key = 'rms_part2_no_err'
+        self.rms_key = 'rms_re_im_noerr'
+        self.rms_index = 1
 
     def _get_lambda(self, it, WtWm, old_lam):
         M = it.Model.convert_to_M(it.m)
@@ -262,7 +265,7 @@ class SearchLambda(BaseLambda):
     """
     Test multiple lambda values for an optimal rms decrease
     """
-    def __init__(self, lam0_obj, rms_key='rms_all', rms_index=0):
+    def __init__(self, lam0_obj, rms_key='rms_all_noerr', rms_index=0):
         """
         Parameters
         ----------

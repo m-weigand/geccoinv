@@ -19,8 +19,8 @@ class plot_iteration(object):
         ax.plot(it.Data.obj.settings['x'], it.Data.Df, '.',
                 label='data')
         ax.legend()
-        ax.set_title('a={0} b={1} rms={2}'.format(it.m[0], it.m[1],
-                                                  it.rms_values['rms_all'][0]))
+        ax.set_title('a={0} b={1} rms={2}'.format(
+            it.m[0], it.m[1], it.rms_values['rms_all_noerr'][0]))
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         fig.savefig(filename)
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     ND.Model.add_regularization(0, RegFuncs.Damping(), lam_obj)
 
-    optimize_for = 'rms_all'
+    optimize_for = 'rms_all_noerr'
     ND.Model.steplength_selector = NDimInv.main.SearchSteplengthParFit(
         optimize_for)
 
