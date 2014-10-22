@@ -5,6 +5,8 @@ To use this module, import * from it:
 
 from NDimInv.plot_helper import *
 """
+use_latex = True
+
 import sys
 already_loaded = 'matplotlib' in sys.modules
 
@@ -31,10 +33,9 @@ mpl.rcParams['mathtext.default'] = 'regular'
 # mpl.rcParams['font.weight'] = 400
 # mpl.rcParams['font.family'] = 'Droid Sans'
 
-mpl.rcParams['text.usetex'] = True
-mpl.rcParams['text.latex.unicode'] = True
-# mpl sometimes has problems with latex and unicde. If you work on utf-8, the
-# following string conversion should do the trick:
+if use_latex:
+    mpl.rcParams['text.usetex'] = True
+    mpl.rcParams['text.latex.unicode'] = True
 
 # sans-serif fonts
 if(False):
