@@ -179,7 +179,8 @@ class ND_Data(object):
                 space for the data set. Use None if no extra dimensions are
                 use.
         """
-        if(self.data_converter is not None):
+        if(self.data_converter is not None and
+           self.obj.data_format is not None):
             data_converted = self.data_converter(
                 data_format, self.obj.data_format, data)
         else:
