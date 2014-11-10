@@ -486,6 +486,7 @@ class Inversion(RMS):
 
     def __init__(self):
         super(Inversion, self).__init__()
+        self._update_dict = {}
 
     def next_iteration(self):
         """
@@ -511,6 +512,7 @@ class Inversion(RMS):
 
         update_m = self._model_update(lams, WtWms)
         alpha = self.Model.steplength_selector.get_steplength(self, update_m)
+        self._update_dict['alpha'] = alpha
         if(alpha is None):
             return None, True
         new_iteration.m = self.m + alpha * update_m
@@ -525,6 +527,7 @@ class Inversion(RMS):
         # add regularizations
         for lam, WtWm in zip(lams, WtWms):
             WtWm_sparse = sparse.csc_matrix(WtWm)
+
             if(type(lam) is not int and not isinstance(lam, float)):
                 A = A + lam.dot(WtWm_sparse)
                 b = b - lam.dot(WtWm_sparse).dot(self.m)
@@ -560,6 +563,26 @@ class Inversion(RMS):
             solve_func))
         return solve_func
 
+    def _prepare_mode_update(self, lams, WtWms):
+        """
+
+        """
+        diff = self.Data.Df - self.f
+        J = sparse.csc_matrix(self.Model.J(self.m))
+        Wd = sparse.csc_matrix(self.Data.Wd)
+        self._update_dict['diff'] = diff
+        self._update_dict['J'] = J
+        self._update_dict['Wd'] = Wd
+        self._update_dict['A_without_reg'] = J.T.dot(Wd.T.dot(Wd.dot(J)))
+        self._update_dict['b_without_reg'] = J.T.dot(Wd.T.dot(Wd.dot(diff)))
+        A, b = self._add_regularisations(self._update_dict['A_without_reg'],
+                                         self._update_dict['b_without_reg'],
+                                         lams, WtWms)
+        self._update_dict['A'] = A
+        self._update_dict['b'] = b
+        self._update_dict['lams'] = lams
+        self._update_dict['WtWms'] = WtWms
+
     def _model_update(self, lams, WtWms):
         """
         Compute the actual model update with the regularisations provided
@@ -574,18 +597,14 @@ class Inversion(RMS):
         -------
         model_update : model update vector
         """
-        # gather components of update formula
-        diff = self.Data.Df - self.f
-        J = sparse.csc_matrix(self.Model.J(self.m))
-        Wd = sparse.csc_matrix(self.Data.Wd)
-        A = J.T.dot(Wd.T.dot(Wd.dot(J)))
-        b = J.T.dot(Wd.T.dot(Wd.dot(diff)))
-        A, b = self._add_regularisations(A, b, lams, WtWms)
+        self._prepare_mode_update(lams, WtWms)
 
+        # gather components of update formula
         solve_func = self._select_solver()
 
         # solve the system of linear equations A x = b
-        update_m = solve_func(A, b)
+        update_m = solve_func(self._update_dict['A'],
+                              self._update_dict['b'])
 
         # save A and b to file
         # import pickle
@@ -597,6 +616,7 @@ class Inversion(RMS):
         # see documentation for the solver functions
         if(isinstance(update_m, tuple)):
             update_m = update_m[0]
+        self._update_dict['update'] = update_m
         return update_m
 
 
