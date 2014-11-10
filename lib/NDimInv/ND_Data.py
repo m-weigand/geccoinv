@@ -85,7 +85,7 @@ class ND_Data(object):
 
         Use as:
 
-        >>> for d, in self.D_iterator():
+        >>> for d in self.D_iterator():
         >>>     self.Data.D[d]
 
         This function provides the slices in the same order as an oder='F'
