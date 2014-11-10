@@ -64,7 +64,14 @@ class model_template(object):
         -------
         Return a dict with a description of the data base dimensions. In this
         case we have frequencies and re/im data
+
+        In the example down below, the frequencies will be set using the
+        settings dict supplied to the __init__ function. Therefore the number of
+        frequencies must be added dynamically here. Do not leave any values as
+        None!
         """
+        print('base data dimensions not set')
+        exit()
         D_base_dims = {0: ['frequency', None],
                        1: ['rre_rmim', 2]
                        }
