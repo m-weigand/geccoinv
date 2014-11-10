@@ -12,10 +12,11 @@ class cole_cole():
     This class could serve as a base class for various CC parameterizations,
     but for now we only use this one
     """
-    def __init__(self):
+    def __init__(self, settings):
         self.data_format = "lnrmag_rpha"
         self.a_save = None
         self.a_pars = None
+        self.set_settings(settings)
 
     def get_data_base_dimensions(self):
         """
@@ -55,8 +56,9 @@ class cole_cole():
         return rmag_rpha
 
     def cc_lnrmag_rpha(self, pars):
-        rmag, rpha = self.cc_rmag_rpha(pars)
-        return np.log(rmag), rpha
+        rlnmag_rpha = self.cc_rmag_rpha(pars)
+        rlnmag_rpha[:, 0] = np.log(rlnmag_rpha[:, 0])
+        return rlnmag_rpha
 
     def cc_rmag_rpha(self, pars):
         data_complex = self.cc_rcomplex(pars)
@@ -67,7 +69,9 @@ class cole_cole():
         # phases, [mrad]
         rpha = 1000 * np.arctan2(data_imag, data_real)
 
-        return rmag, rpha
+        rmag_rpha = np.vstack((rmag, rpha)).T
+
+        return rmag_rpha
 
     def cc_rcomplex(self, pars):
         # determine number of Cole-Cole terms
@@ -89,9 +93,9 @@ class cole_cole():
         # compute Cole-Cole function, each term separately
         for k in range(0, nr_cc_terms):
             term[:, k] = (m[k]) * (1 - 1 /
-                                  (1 +
-                                   ((0 + 1j) * 2 * np.pi * f * tau[k]) **
-                                   c[k]))
+                                   (1 +
+                                    ((0 + 1j) * 2 * np.pi * f * tau[k]) **
+                                    c[k]))
 
         # sum up
         term_g = np.sum(term, 1)
@@ -251,11 +255,11 @@ class cole_cole():
         return self.a_save
 
 
-def get(parameterization):
+def get(parameterization, settings):
     """
     Return an modelling object for the given parameterization
     """
     if(parameterization == 'logrho0_m_logtau_c'):
-        return cole_cole()
+        return cole_cole(settings)
     else:
         raise TypeError('Parameterization not known!')
