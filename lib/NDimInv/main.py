@@ -626,7 +626,7 @@ class Iteration(Inversion):
         self.lams = None
         self.statpars = None
 
-    def plot(self, filename='iteration'):
+    def plot(self, filename='iteration', **kwargs):
         output_filename = "plot_"
         if('global_prefix' in self.Model.obj.settings):
             output_filename += self.Model.obj.settings['global_prefix']
@@ -637,7 +637,7 @@ class Iteration(Inversion):
         if(self.Model.custom_plot_func is None):
             self._plot_default(output_filename)
         else:
-            self.Model.custom_plot_func.plot(self, output_filename)
+            self.Model.custom_plot_func.plot(self, output_filename, **kwargs)
 
     def _plot_default(self, filename):
         """
