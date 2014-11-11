@@ -258,6 +258,15 @@ class cole_cole():
 def get(parameterization, settings):
     """
     Return an modelling object for the given parameterization
+
+    Parameters
+    ----------
+    parameterization : 'logrho0_m_logtau_c'
+    settings : {'frequencies' : np.array}
+
+    Returns
+    -------
+    A cole-cole object
     """
     if(parameterization == 'logrho0_m_logtau_c'):
         return cole_cole(settings)
