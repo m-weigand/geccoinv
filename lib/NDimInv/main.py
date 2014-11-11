@@ -559,8 +559,8 @@ class Inversion(RMS):
                 exit()
         else:
             solve_func = SL.spsolve
-        print('Using function {0} to solve system of lin. equations'.format(
-            solve_func))
+        # print('Using function {0} to solve system of lin. equations'.format(
+        #     solve_func))
         return solve_func
 
     def _prepare_mode_update(self, lams, WtWms):
