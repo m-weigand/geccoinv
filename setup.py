@@ -25,6 +25,7 @@ if __name__ == '__main__':
           package_dir={'': 'lib'},
           packages=['lib_cc',
                     'lib_cc2',
+                    'lib_cc_conductivity',
                     'NDimInv',
                     'sip_formats'],
           scripts=[],
