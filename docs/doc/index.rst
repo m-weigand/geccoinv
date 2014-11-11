@@ -9,6 +9,7 @@
     tutorial1
     design_overview
     inversion
+    debugging
 
 ========
 GeccoInv
@@ -46,6 +47,11 @@ Inversion
 =========
 
 :doc:`inversion`
+
+Debugging
+==========
+
+:doc:`debugging`
 
 Copyright
 =========
