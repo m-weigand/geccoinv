@@ -10,6 +10,61 @@ nosetests test_convert.py -s -v
 from nose.tools import *
 import numpy as np
 import sip_formats.convert as sip_convert
+import numpy.testing
+
+
+class test_input_styles(object):
+    """
+    Test the three input styles:
+
+        * 1D
+        * 2D - one spectrum
+        * 2D - multiple spectra
+    """
+    def precompute_values(self):
+        rmag = np.array([49.999, 31.623, 24.992])
+        rpha = np.array([-5.0000, -321.7506, -24.9948])
+        Z = rmag * np.exp(1j * rpha / 1000)
+        Y = 1 / Z
+        rre = np.real(Z)
+        rim = np.imag(Z)
+        cre = np.real(Y)
+        cim = np.imag(Y)
+        cmag = np.abs(Y)
+        cpha = np.arctan2(np.imag(Y), np.real(Y)) * 1000
+
+        self.rmag = rmag
+        self.rpha = rpha
+        self.rre = rre
+        self.rim = rim
+        self.rmim = -rim
+
+        self.cmag = cmag
+        self.cpha = cpha
+        self.cre = cre
+        self.cim = cim
+        self.cmim = -cim
+
+    def setup(self):
+        self.precompute_values()
+
+    def test_input_styles(self):
+        # prepare test styles
+        data_1d = np.hstack((self.cmag, self.cpha))
+        data_2d_one_spec = np.vstack((self.cmag, self.cpha))
+        data_2d_multi_specs = np.vstack((data_1d, data_1d))
+
+        for data, one_spec in zip(
+            (data_1d, data_2d_one_spec, data_2d_multi_specs),
+                (False, True, False)):
+            data_converted = sip_convert.convert('cmag_cpha', 'rmag_rpha',
+                                                 data, one_spec)
+            assert_equal(data.shape, data_converted.shape)
+            data_backconverted = sip_convert.convert('rmag_rpha', 'cmag_cpha',
+                                                     data_converted, one_spec)
+            numpy.testing.assert_almost_equal(
+                data, data_backconverted,
+                decimal=5)
 
 
 class test_converters():
@@ -98,7 +153,11 @@ class test_converters():
 
     def test_convert(self):
         """
-        We test by converting to all values, from all values
+        We test by converting to all values, from all values. This is a chain
+        test, i.e. we only provide the first input data, and then we use the
+        output of this conversion to feed the next conversion. The last
+        conversion then converts back to the initial data format, and thus we
+        can compare those outputs to the hardcoded values.
         """
         from_keys = sip_convert.from_converters.keys()
 

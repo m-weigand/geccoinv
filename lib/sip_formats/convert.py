@@ -79,7 +79,7 @@ def from_log10rmag_rpha(data):
 
 def from_lnrmag_rpha(data):
     rlnmag, rpha = split_data(data)
-    Z = to_complex(np.exp(rlnmag, rpha))
+    Z = to_complex(np.exp(rlnmag), rpha)
     Y = 1 / Z
     real_part = np.real(Y)
     imag_part = np.imag(Y)
@@ -202,7 +202,7 @@ to_converters = {
 }
 
 
-def convert(input_format, output_format, data):
+def convert(input_format, output_format, data, one_spectrum=False):
     """
     Convert from the given format to the requested format
 
@@ -211,8 +211,12 @@ def convert(input_format, output_format, data):
     input_format : format of input data (parameter 'data')
     output_format : format of output data
     data : numpy array containing data in specified input format
+    one_spectrum : True|False, the input data comprises one spectrum. This
+                   allows for an additional format of the data array.
 
     Possible input/output formats:
+    ------------------------------
+
         'lnrmag_rpha'
         'log10rmag_rpha'
         'rmag_rpha'
@@ -222,18 +226,56 @@ def convert(input_format, output_format, data):
         'cre_cim'
         'cre_cmim'
 
+    Array format
+    ------------
+
+    data is either 1D or 2D. A 1D array correspond to one spectrum, with double
+    the size of the frequencies (which are not needed for the conversion). Thus,
+    the first halt either comprises a magnitude data, and the second one phase
+    data, or the parts comprise real and imaginary parts.
+
+    For the 2D case there exist two possibilities:
+
+    First, if one_spectrum is False, then the first axis denotes the spectrum
+    number, and each spectrum is stored on the second axis as described for the
+    1D case.
+
+    Second, if one_spectrum is True, and the first axis has the size two, then
+    the axis denotes either magnitude (index 0) and phase (index 1), or real
+    (index 0) and imaginary (index 1) parts. The second axis has the same size
+    as there are frequencies.
+
     Internally we always convert to real part and imaginary part of
     conductivity, and then convert back to the output format.
+
+    Return values are of the same dimensions as input variables.
     """
-    if(input_format == output_format):
+    if input_format == output_format:
         return data
 
-    if(input_format not in from_converters):
+    if input_format not in from_converters:
         raise KeyError('Input format {0} not known!'.format(input_format))
 
-    if(output_format not in to_converters):
+    if output_format not in to_converters:
         raise KeyError('Output format {0} not known!'.format(output_format))
 
-    cre, cim = from_converters[input_format](data)
+    # internally we always work with the second axis of double the frequency
+    # size
+    if len(data.shape) == 2 and data.shape[0] == 2 and one_spectrum:
+        work_data = np.hstack((data[0, :], data[1, :]))
+        one_spec_2d = True
+    else:
+        work_data = data
+        one_spec_2d = False
+
+    cre, cim = from_converters[input_format](work_data)
     converted_data = to_converters[output_format](cre, cim)
+
+    if one_spec_2d:
+        part1, part2 = split_data(converted_data, True)
+        converted_data = np.vstack((part1, part2))
+
+    # reshape to input size (this should only be necessary for 1D data)
+    if len(data.shape) == 1:
+        converted_data = np.squeeze(converted_data)
     return converted_data
