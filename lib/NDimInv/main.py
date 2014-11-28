@@ -233,6 +233,8 @@ class SearchSteplengthParFit(object):
                 alpha_values.append(test_alpha)
             except FloatingPointError:
                 pass
+            except ArithmeticError:
+                pass
 
         if(len(rms_values) != 3):
             print('Not all steplengths could be calculated. ' +
