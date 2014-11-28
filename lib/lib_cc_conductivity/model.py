@@ -32,23 +32,26 @@ class colecole_conductivity(object):
                                (1 + (1j * self.w * np.exp(pars[2]))**pars[3]))
         return sigma
 
-    def mag(self):
+    def mag(self, pars):
         r"""Magnitude (|rho|)
         """
-        rho_complex = self.complex()
+        rho_complex = self.complex(pars)
         mag = np.abs(rho_complex)
         return mag
 
-    def pha(self):
+    def pha(self, pars):
         r"""Phase shift (arctan2(im, rho)) [mrad]
         """
-        pha = 1000 * np.arctan2(self.imag(), self.real())
+        rho_complex = self.complex(pars)
+        real = np.real(rho_complex)
+        imag = np.imag(rho_complex)
+        pha = 1000 * np.arctan2(imag, real)
         return pha
 
-    def mag_pha(self):
-        mag = self.mag()
-        pha = self.pha()
-        return mag, pha
+    def mag_pha(self, pars):
+        mag = self.mag(pars)
+        pha = self.pha(pars)
+        return np.vstack((mag, pha))
 
     def real(self):
         r"""Real part
