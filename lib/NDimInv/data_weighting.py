@@ -41,6 +41,10 @@ def get_weighting_all_to_one(base_data):
 
 def get_weighting_rel_abs(base_data):
     # data are on log
-    data = np.exp(base_data)
-    errors = np.log(0.05 * data + 0.01)
+    data = 10 ** base_data
+    errors = np.log10(0.05 * data + 0.01)
     return 1 / errors
+
+
+def get_weighting_one(base_data):
+    return np.ones(base_data.size)

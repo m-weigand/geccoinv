@@ -85,6 +85,7 @@ class ND_Data(object):
         for index in range(0, self.Df.size, dataset_size):
             basedata = self.Df[index:index + dataset_size]
             weightings = data_weighting.get_weighting_re_vs_im(basedata)
+            # weightings = data_weighting.get_weighting_one(basedata)
             # weightings = data_weighting.get_weighting_all_to_one(basedata)
             # weightings = data_weighting.get_weighting_rel_abs(basedata)
             errors += list(weightings)
