@@ -549,17 +549,20 @@ def load_column_file_to_elements(filename, columns):
     """
     Import data to be plotted on the grid from a file with the following
     structure:
+
     1. Line: Number of entries
     2. - to [Number of entries + 1]: One or more columns of data points
 
-    Parameters:
-        filename    -   file to import
-        columns     -   list with indices to load, starting with 0
+    Parameters
+    ----------
+    filename : file to import
+    columns : list with indices to load, starting with 0
 
     WARNING: This function assumes that the first line contains as many columns
     as the rest of the file!
 
     Return a list with the entries in the global data matrix, which were added
+
     """
     tmp_data = np.loadtxt(filename, dtype=float, skiprows=1)
 
@@ -585,14 +588,17 @@ def load_column_file_to_elements_advanced(
 
     Parameters
     ----------
+
     filename: Data filename containing column data
     columns: List of column ids to import, starting from zero. Examples:
              [0,4,3] or [1,]
-    first_line_contains_nr_elements: False: read as many elements a loaded in
-                                            the grid. Exit if no grid was
-                                            loaded yet!
-                                     True: read as many elements as written in
-                                            the first line
+
+    first_line_contains_nr_elements: False - read as many elements a loaded in
+                                     the grid. Exit if no grid was
+                                     loaded yet!
+                                     True  - read as many elements as written in
+                                     the first line
+
     no_header_line: True: No header line is expected, the first line is assumed
                     to be data
 
@@ -600,6 +606,7 @@ def load_column_file_to_elements_advanced(
     -------
     indices: list of internal indices that identify the loaded columns. These
              indices can the be passed to the plotting functions.
+
     """
 
     fid = open(filename, 'r')
