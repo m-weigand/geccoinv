@@ -126,7 +126,11 @@ class ND_Data(object):
         """
         WD = np.zeros_like(self.D)
         for slice_d in self.D_iterator():
-            weightings = data_weighting.get_weighting_re_vs_im(self.D[slice_d])
+            # weightings = data_weighting.get_weighting_re_vs_im(
+            #       self.D[slice_d])
+            # weightings = data_weighting.get_weighting_one(basedata)
+            # weightings = data_weighting.get_weighting_all_to_one(basedata)
+            weightings = data_weighting.get_weighting_rel_abs(self.D[slice_d])
             WD[slice_d] = weightings
         return WD
 
