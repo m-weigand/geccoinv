@@ -126,7 +126,8 @@ class SmoothingSecondOrder(BaseRegularization):
         else:
             W = R1
         R = W.T.dot(W)
-        # RR = R.T.dot(R)
+        RR = R.T.dot(R)
+        return RR
 
         R = np.zeros((parsize - 2, parsize))
         for i in range(0, parsize - 2):
