@@ -126,11 +126,12 @@ class ND_Data(object):
         """
         WD = np.zeros_like(self.D)
         for slice_d in self.D_iterator():
-            # weightings = data_weighting.get_weighting_re_vs_im(
-            #       self.D[slice_d])
+            weightings = data_weighting.get_weighting_re_vs_im(
+                self.D[slice_d])
             # weightings = data_weighting.get_weighting_one(basedata)
             # weightings = data_weighting.get_weighting_all_to_one(basedata)
-            weightings = data_weighting.get_weighting_rel_abs(self.D[slice_d])
+            # weightings = data_weighting.get_weighting_rel_abs(
+            #   self.D[slice_d])
             WD[slice_d] = weightings
         return WD
 
@@ -147,7 +148,7 @@ class ND_Data(object):
         """
         D = self.D
         if(self.extra_mask is not None):
-            index = [slice(0,  x) for x in self.D_base_size] + self.extra_mask
+            index = [slice(0, x) for x in self.D_base_size] + self.extra_mask
             D = D[tuple(index)]
 
         Df = D.flatten(order='F')
