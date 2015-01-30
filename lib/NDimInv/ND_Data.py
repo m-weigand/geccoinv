@@ -72,28 +72,6 @@ class ND_Data(object):
                 raise IOError('Requested extra dimensional position {0} ' +
                               'lies outside of registered size'.format(index))
 
-    @property
-    def Wd_old(self):
-        """
-        Compute data weighting matrix. This matrix is solely dependent on the
-        input data
-        """
-        errors = []
-        dataset_size = self.obj.get_data_base_size()
-        # loop through data sets
-        # TODO: this should be implemented as an iterator
-        for index in range(0, self.Df.size, dataset_size):
-            basedata = self.Df[index:index + dataset_size]
-            weightings = data_weighting.get_weighting_re_vs_im(basedata)
-            # weightings = data_weighting.get_weighting_one(basedata)
-            # weightings = data_weighting.get_weighting_all_to_one(basedata)
-            # weightings = data_weighting.get_weighting_rel_abs(basedata)
-            errors += list(weightings)
-
-        errors = np.array(errors).flatten()
-        Wd = np.diag(errors)
-        return Wd
-
     def D_iterator(self):
         """
         Generator for base_dimensional chunks of D, i.e. iterate over all
