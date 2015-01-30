@@ -290,7 +290,8 @@ class SearchSteplength(object):
 
     Check a list of fixed alpha values for the optimal value
     """
-    def __init__(self, fixed_values=None, rms_key='rms_all_noerr', rms_index=1):
+    def __init__(self, fixed_values=None, rms_key='rms_all_noerr',
+                 rms_index=1):
         """
         Parameters
         ----------
@@ -376,13 +377,17 @@ class InversionControl(object):
     def get_initial_iteration(self):
         """Return a bare iteration object initialized with the starting model
         and all registered RMS values.
-        """
-        it = Iteration(0, self.Data, self.Model, self.RMS)
 
-        # starting model
+        Usually only the first iteration is initialized using this function.
+        Afterwards, new iterations are based upon the last iteration.
+        """
+        it = Iteration(0, self.Data, self.Model, self.RMS, self.settings)
+
+        # set starting model
         it.m = self.Model.m0
         it.f = self.Model.f(it.m)
-        # set lam0 values
+
+        # set initial regularisation (lam0) values
         it.lams, _ = self.Model.retrieve_lams_and_WtWms(it)
         return it
 
@@ -501,7 +506,7 @@ class Inversion(RMS):
                    False here an the inversion is stopped
         """
         new_iteration = Iteration(self.nr + 1, self.Data, self.Model,
-                                  self.RMS)
+                                  self.RMS, self.settings)
 
         lams, WtWms = self.Model.retrieve_lams_and_WtWms(self)
         new_iteration.lams = lams
@@ -513,6 +518,13 @@ class Inversion(RMS):
         # # debug end
 
         update_m = self._model_update(lams, WtWms)
+
+        # its (memory-wise) expensive to keep all details of the inversion
+        # process. Delete them if requested
+        retain_it_details = os.getenv('NDIMINV_RETAIN_DETAILS')
+        if retain_it_details != '1':
+            self._update_dict.clear()
+
         alpha = self.Model.steplength_selector.get_steplength(self, update_m)
         self._update_dict['alpha'] = alpha
         if(alpha is None):
@@ -614,7 +626,7 @@ class Inversion(RMS):
         #     pickle.dump(A, outfile, pickle.HIGHEST_PROTOCOL)
         # np.savetxt('b.dat', b)
 
-        # sometime we get a list, in this instance take only the first element
+        # sometimes we get a list, in this instance take only the first element
         # see documentation for the solver functions
         if(isinstance(update_m, tuple)):
             update_m = update_m[0]
@@ -626,7 +638,7 @@ class Iteration(Inversion):
     """
     This class holds all information of one iteration
     """
-    def __init__(self, nr, Data, Model, RMS):
+    def __init__(self, nr, Data, Model, RMS, settings):
         """
         Parameters
         ----------
@@ -634,6 +646,7 @@ class Iteration(Inversion):
         Data : Data object
         Model : Model object
         rms_types : dict defining the rms types to be computed
+        settings: settings-dict as used by the NDimInv object
         """
         super(Iteration, self).__init__()
 
@@ -641,8 +654,10 @@ class Iteration(Inversion):
         self.nr = nr
         self.Data = Data
         self.Model = Model
+        self.settings = settings
 
-        # the following parameters will be set during the inversion process
+        # the following parameters will be computed during the inversion
+        # process
         self.m = None
         self.f = None
         self.lams = None
@@ -707,7 +722,11 @@ class Iteration(Inversion):
         self.Data/self.Model will only be copied by reference. Thus if you
         change them here they will be changed everywhere.
         """
-        it_copy = Iteration(self.nr, self.Data, self.Model, self.RMS)
+        it_copy = Iteration(self.nr,
+                            self.Data,
+                            self.Model,
+                            self.RMS,
+                            self.settings)
 
         # copy all variables
         it_copy.m = self.m
@@ -723,7 +742,7 @@ class Iteration(Inversion):
         dictionary
         """
         self.statpars = {}
-        # loop over the m instances
+        # loop over the m instances (i.e. the base dimensions)
         parsize = self.Model.M_base_dims[0][1]
         for nr, index in enumerate(range(0, self.m.size, parsize)):
             one_parset = self.m[index: index + parsize]
@@ -824,8 +843,8 @@ class Iteration(Inversion):
                 ax.axvline(x=i, color='k', linestyle='dashed', linewidth=0.5)
             ax.set_xlim([0, len(reg_strength)])
             ax.set_xlabel('Parameter number')
-            ylabel = r'$\lambda \cdot \underline{\underline{W}}^T '
-            ylabel += r'\underline{\underline{W}} \underline{m}$'
+            ylabel = r''.join(('$\lambda \cdot \underline{\underline{W}}^T ',
+                               '\underline{\underline{W}} \underline{m}$'))
 
             ax.set_ylabel(ylabel)
             ax.grid(True)
