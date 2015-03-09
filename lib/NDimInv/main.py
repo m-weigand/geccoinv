@@ -431,6 +431,11 @@ class InversionControl(object):
         """
         Return True if one of the stopping criteria applies
         """
+
+        # return if any NaN values are found in the new parameters
+        if np.any(np.isnan(new_it.m)):
+            return True
+
         rms_upd_eps = 1e-5  # min. requested rms change between iterations
         allowed_rms_im_increase_first_iteration = 1e2
 
