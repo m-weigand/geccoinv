@@ -436,6 +436,11 @@ class InversionControl(object):
         if np.any(np.isnan(new_it.m)):
             return True
 
+        # return if any value is below 1e-15
+        if np.any(new_it.m[1:] < -15):
+            return True
+            raise Exception('values below 1e-15')
+
         rms_upd_eps = 1e-5  # min. requested rms change between iterations
         allowed_rms_im_increase_first_iteration = 1e2
 
@@ -465,7 +470,8 @@ class InversionControl(object):
         # stop of the rms increase does not lie above a certain threshold
         rms_diff = np.abs(new_rms - old_rms)
         if(rms_diff < rms_upd_eps):
-            print('RMS update below threshold')
+            print('RMS update below threshold: {0} - {1} < {2}'.format(
+                new_rms, old_rms, rms_upd_eps))
             return True
 
         return False
