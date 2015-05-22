@@ -16,7 +16,7 @@ than mapped to the requested dimensions (see :doc:`inversion`).
 
 .. blockdiag::
 
-    NDimInv {
+    blockdiag NDimInv {
         NDimInv -> ND_Model, ND_Data;
         ND_Model -> Model_Object;
         NDimInv -> iteartion_list -> Iteration <- Inversion
