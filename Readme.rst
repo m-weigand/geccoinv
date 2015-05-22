@@ -4,8 +4,7 @@ GeccoInv - N-dimensional geophysical inversion framework
 Licence
 -------
 
-This program is licenced under the GPL3 or later licence. See LICENCE.txt and
-headers of individual files for more information.
+Copyright: Maximilian Weigand, 2014-2015
 
 Requirements
 ------------
