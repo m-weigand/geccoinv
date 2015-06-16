@@ -47,13 +47,13 @@ class cc_res():
 
         pars = np.atleast_2d(pars)
 
-        nr_pars = pars.shape[1]
+        nr_pars = (pars.shape[1] - 1) / 3
         self.rho0 = 10 ** (pars[:, 0])
-        self.m = pars[:, 1:nr_pars:3]
-        self.tau = 10 ** (pars[:, 2:nr_pars:3])
-        self.c = pars[:, 3:nr_pars:3]
+        self.m = pars[:, 1:nr_pars + 1]
+        self.tau = 10 ** (pars[:, nr_pars + 1: 2 * nr_pars + 1])
+        self.c = pars[:, 2 * nr_pars + 1:]
 
-        # print 'pars'
+        # print 'pars', nr_pars
         # print 'rho0', self.rho0
         # print 'm', self.m, self.m.shape
         # print 'tau', self.tau
@@ -62,8 +62,11 @@ class cc_res():
         # in order to compute multiple parameter sets at once (i.e. for a
         # decomposition approach), we need to resize the variables to enable
         # broadcasting
+        # [nr specs] [nr terms] [nr freqs]
         new_size = (self.rho0.size, self.m.shape[1], self.w_orig.size)
         new_size_reversed = [x for x in reversed(new_size)]
+
+        # [nr specs] [nr freqs]
         new_size_rho0 = (self.rho0.size, self.w_orig.size)
         new_size_rho0_rev = (self.w_orig.size, self.rho0.size)
 
@@ -90,12 +93,11 @@ class cc_res():
         :math:`\hat{\rho} = \rho_0 \left(1 - \sum_i m_i (1 - \frac{1}{1 + (j
         \omega \tau_i)^c_i})\right)`
         """
-        print 'complex pars', pars
         self.set_parameters(pars)
-        terms = 1 - self.m * (1 - (1 / (1 + (1j * self.w * self.tau)**self.c)))
+        terms = self.m * (1 - (1 / (1 + (1j * self.w * self.tau)**self.c)))
         # sum up terms
         specs = np.sum(terms, axis=1)
-        rho = self.rho0 * specs
+        rho = self.rho0 * (1 - specs)
 
         return rho
 
@@ -164,15 +166,17 @@ class cc_res():
         (\omega \tau)^c cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}}`
         """
         self.set_parameters(pars)
-        nominator = self.m * self.otc * np.cos(self.ang) + self.otc2
+        nominator = self.m * self.otc * (np.cos(self.ang) + self.otc)
         term = nominator / self.denom
         specs = np.sum(term, axis=1)
 
         result = 1 - specs
         return result
 
-    def dre_dlnrho0(self, pars):
-        result = np.log(10) * self.rho0 * self.dre_drho0(pars)
+    def dre_dlog10rho0(self, pars):
+        # first call the linear response to set the parameters
+        linear_response = self.dre_drho0(pars)
+        result = np.log(10) * self.rho0 * linear_response
         return result
 
     def dre_dm(self, pars):
@@ -182,11 +186,10 @@ class cc_res():
         (\omega \tau)^c cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}}`
         """
         self.set_parameters(pars)
-        nominator = -self.otc * np.cos(self.ang) + self.otc
+        nominator = -self.otc * (np.cos(self.ang) + self.otc)
         result = nominator / self.denom
-        specs = np.sum(result, axis=1)
-        specs *= self.rho0
-        return specs
+        result *= self.rho0[:, np.newaxis, :]
+        return result
 
     def dre_dtau(self, pars):
         r"""
@@ -201,7 +204,7 @@ class cc_res():
         """
         self.set_parameters(pars)
         # term1
-        nom1 = - self.m * self.w**self.c * self.tau**(self.c - 1) *\
+        nom1 = - self.m * self.c * self.w**self.c * self.tau**(self.c - 1) *\
             np.cos(self.ang) - self.m * self.w**(2 * self.c) *\
             2 * self.c * self.tau**(2 * self.c - 1)
         term1 = nom1 / self.denom
@@ -214,13 +217,13 @@ class cc_res():
         term2 = nom2 / self.denom**2
 
         result = term1 + term2
-        specs = np.sum(result, axis=1)
-        specs *= self.rho0
-        return specs
+        result *= self.rho0[:, np.newaxis, :]
+        return result
 
-    def dre_dlntau(self, pars):
+    def dre_dlog10tau(self, pars):
         # self.set_parameters(pars)
-        result = 1.0 / self.real(pars) * self.dre_dtau(pars)
+        lin_response = self.dre_dtau(pars)
+        result = np.log(10) * self.tau * lin_response
         return result
 
     def dre_dc(self, pars):
@@ -239,21 +242,20 @@ class cc_res():
         self.set_parameters(pars)
         # term1
         nom1 = - self.m * np.log(self.w * self.tau) * self.otc *\
-            np.cos(self.ang) + self.m * self.otc * (np.pi / 2) *\
+            np.cos(self.ang) + self.m * self.otc * (np.pi / 2.0) *\
             np.sin(self.ang) + np.log(self.w * self.tau) * self.otc
         term1 = nom1 / self.denom
 
         # term2
-        nom2 = (- self.m * self.otc * (np.cos(self.ang + self.otc))) *\
+        nom2 = (- self.m * self.otc * (np.cos(self.ang) + self.otc)) *\
             (- 2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) +
-             2 * self.otc * (np.pi / 2) * np.cos(self.ang) +
-             2 * np.log(self.w * self.tau) * self.otc2)
+             2 * self.otc * (np.pi / 2.0) * np.cos(self.ang) +
+            2 * np.log(self.w * self.tau) * self.otc2)
         term2 = nom2 / self.denom**2
 
         result = term1 + term2
-        specs = np.sum(result, axis=1)
-        specs *= self.rho0
-        return specs
+        result *= self.rho0[:, np.newaxis, :]
+        return result
 
     def dim_drho0(self, pars):
         r"""
@@ -267,8 +269,9 @@ class cc_res():
         result = np.sum(terms, axis=1)
         return result
 
-    def dim_dlnrho0(self, pars):
-        result = 1 / self.imag(pars) * self.dim_drho0(pars)
+    def dim_dlog10rho0(self, pars):
+        lin_resp = self.dim_drho0(pars)
+        result = np.log(10) * self.rho0 * lin_resp 
         return result
 
     def dim_dm(self, pars):
@@ -280,9 +283,8 @@ class cc_res():
         self.set_parameters(pars)
         nominator = -self.otc * np.sin(self.ang)
         result = nominator / self.denom
-        specs = np.sum(result, axis=1)
-        specs *= self.rho0
-        return specs
+        result *= self.rho0[:, np.newaxis, :]
+        return result
 
     def dim_dtau(self, pars):
         r"""
@@ -308,12 +310,12 @@ class cc_res():
         term2 = nom2 / self.denom**2
 
         result = term1 + term2
-        specs = np.sum(result, axis=1)
-        specs *= self.rho0
-        return specs
+        result *= self.rho0[:, np.newaxis, :]
+        return result
 
-    def dim_dlntau(self, pars):
-        result = 1 / self.imag(pars) * self.dim_dtau(pars)
+    def dim_dlog10tau(self, pars):
+        lin_resp = self.dim_dtau(pars)
+        result = np.log(10) * self.tau * lin_resp
         return result
 
     def dim_dc(self, pars):
@@ -343,9 +345,8 @@ class cc_res():
         term2 = nom2 / self.denom**2
         result = term1 + term2
 
-        specs = np.sum(result, axis=1)
-        specs *= self.rho0
-        return specs
+        result *= self.rho0[:, np.newaxis, :]
+        return result
 
     def Jacobian_re_im(self, pars):
         r"""
@@ -353,15 +354,15 @@ class cc_res():
         """
         partials = []
 
-        partials.append(self.dre_drho0(pars))
+        partials.append(self.dre_dlog10rho0(pars)[:, np.newaxis, :])
         partials.append(self.dre_dm(pars))
-        partials.append(self.dre_dtau(pars))
+        partials.append(self.dre_dlog10tau(pars))
         partials.append(self.dre_dc(pars))
-        # partials.append(self.dim_drho0(pars))
-        # partials.append(self.dim_dm(pars))
-        # partials.append(self.dim_dtau(pars))
-        # partials.append(self.dim_dc(pars))
-        J = np.array(partials)
+        partials.append(self.dim_dlog10rho0(pars)[:, np.newaxis, :])
+        partials.append(self.dim_dm(pars))
+        partials.append(self.dim_dlog10tau(pars))
+        partials.append(self.dim_dc(pars))
+        J = np.concatenate(partials, axis=1)
         return J
 
     def dmag_drho0(self):
