@@ -1,3 +1,3 @@
-from .cc import colecole as colecole
+from .resistivity import cc_res as cc_res
 
-all = [colecole, ]
+all = [cc_res, ]
