@@ -152,3 +152,13 @@ In the near future we plan to also implement the following feature(s):
 * we could think of skipping those spectra in those cases and increase the
   regularization to the next spectrum in the specific dimension. Howoever, this
   requires some detailed planning ;-)
+
+Spectral models
+---------------
+
+
+.. blockdiag::
+
+    blockdiag specmod {
+        "SIP signature" -> "Cole-Cole model";
+    }

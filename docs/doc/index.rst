@@ -212,6 +212,7 @@ API
     api/NDimInv
     api/lib_cc
     api/lib_cc
+    api/lib_cc2
     api/sip_formats
 
 Indices and tables
