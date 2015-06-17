@@ -36,6 +36,7 @@ print 'diff_re_c', diff_re_c.min(), diff_re_c.max()
 
 Jnum = nd.Jacobian(cc.imag, order=4)
 Jimnum = Jnum(pars1).T
+
 # diff rho0
 diff_im_rho0 = Jimnum[0, :] - J.squeeze()[4, :]
 print 'diff_im_rho0', diff_im_rho0.min(), diff_im_rho0.max()

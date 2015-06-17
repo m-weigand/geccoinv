@@ -124,19 +124,28 @@ class cc_res():
 
     def real(self, pars):
         r"""
-        :math:`\rho'(\omega) = \rho_0 \cdot \left(1 - m \frac{ (\omega \tau)^{c}
-        \left(cos(\frac{c \pi}{2}) + (\omega \tau)^{c}\right)}{1 + 2 (\omega
-        \tau)^c cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}}\right)`
         """
         rhoi = self.complex(pars)
         real = np.real(rhoi)
-        # self.set_parameters(pars)
-        # # helper terms
-        # numerator = np.cos(self.ang) + self.otc
-        # term = numerator / self.denom
-
-        # real_cc = self.rho0 * (1 - self.m * self.otc * (term))
         return real
+
+    def real_analytical(self, pars):
+        r"""
+        :math:`\rho'(\omega) = \rho_0 \cdot \left(1 - m \frac{ (\omega
+        \tau)^{c} \left(cos(\frac{c \pi}{2}) + (\omega \tau)^{c}\right)}{1 + 2
+        (\omega \tau)^c cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}}\right)`
+        """
+        self.set_parameters(pars)
+        # # helper terms
+        numerator = np.cos(self.ang) + self.otc
+
+        term = self.m * self.otc * numerator
+        term /= self.denom
+
+        result = np.sum(term, axis=1)
+        result = self.rho0 * (1 - result)
+        return result
+
 
     def imag(self, pars):
         r"""Imaginary part
@@ -151,6 +160,19 @@ class cc_res():
 
         # imag_cc = term
         return imag
+
+    def imag_analytical(self, pars):
+        r"""Imaginary part
+        :math:`\rho''(\omega) = m \frac{ - \rho_0 (\omega \tau)^{c}
+        sin(\frac{c \pi}{2})}{1 + 2 (\omega
+        \tau)^c cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}}`
+        """
+        numerator = - self.m * self.otc * np.sin(self.ang)
+        term = numerator / self.denom
+
+        result = np.sum(term, axis=1)
+        result *= self.rho0
+        return result
 
     def re_im(self, pars):
         r"""Return :math:`\hat{\rho}' and \hat{\rho}''`
@@ -303,7 +325,7 @@ class cc_res():
         term1 = nom1 / self.denom
 
         # term2
-        nom2 = (- self.m * self. otc * np.sin(self.ang)) *\
+        nom2 = (self.m * self.otc * np.sin(self.ang)) *\
             (2 * self.w**self.c * self.c * self.tau**(self.c - 1) *
              np.cos(self.ang) + 2 * self.c * self.w**(2 * self.c) *
              self.tau**(2 * self.c - 1))
@@ -332,16 +354,16 @@ class cc_res():
         """
         self.set_parameters(pars)
         # term1
-        nom1 = - self.m * np.sin(self.ang) *\
-            np.log(self.w * self.tau) * self.otc - self.m *\
-            self.otc * (np.pi / 2) * np.cos(self.ang)
-        term1 = nom1 / self.denom
+        nom1a = - self.m * np.log(self.w * self.tau) *  self.otc *\
+                np.sin(self.ang)
+        nom1b = - self.m * self.otc * (np.pi / 2.0) * np.cos(self.ang)
+        term1 = (nom1a + nom1b) / self.denom
 
         # term2
         nom2 = (- self.m * self.otc * np.sin(self.ang)) *\
-            ((- 2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) +
-             2 * self.otc * (np.pi / 2) * np.cos(self.ang)) +
-             (2 * np.log(self.w * self.tau) * self.otc2))
+            (2 * np.log(self.w * self.tau) * self.otc -
+             2 * self.otc * (np.pi / 2.0) * np.sin(self.ang) +
+             2 * np.log(self.w * self.tau) * self.otc2)
         term2 = nom2 / self.denom**2
         result = term1 + term2
 
