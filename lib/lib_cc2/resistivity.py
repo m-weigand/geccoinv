@@ -390,35 +390,35 @@ class cc_res():
         J = np.concatenate(partials, axis=1)
         return J
 
-    def dmag_drho0(self):
-        pass
+    # def dmag_drho0(self):
+    #     pass
 
-    def dmag_dm(self):
-        pass
+    # def dmag_dm(self):
+    #     pass
 
-    def dmag_dtau(self):
-        pass
+    # def dmag_dtau(self):
+    #     pass
 
-    def dmag_dlntau(self):
-        pass
+    # def dmag_dlntau(self):
+    #     pass
 
-    def dmag_dc(self):
-        pass
+    # def dmag_dc(self):
+    #     pass
 
-    def dpha_drho0(self):
-        pass
+    # def dpha_drho0(self):
+    #     pass
 
-    def dpha_dm(self):
-        pass
+    # def dpha_dm(self):
+    #     pass
 
-    def dpha_dtau(self):
-        pass
+    # def dpha_dtau(self):
+    #     pass
 
-    def dpha_dlntau(self):
-        pass
+    # def dpha_dlntau(self):
+    #     pass
 
-    def dpha_dc(self):
-        pass
+    # def dpha_dc(self):
+    #     pass
 
-    def Jacobian_mag_pha(self):
-        pass
+    # def Jacobian_mag_pha(self):
+    #     pass
