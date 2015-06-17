@@ -174,12 +174,12 @@ class cc_res():
         result *= self.rho0
         return result
 
-    def re_im(self, pars):
+    def reim(self, pars):
         r"""Return :math:`\hat{\rho}' and \hat{\rho}''`
         """
-        re = self.real()
-        im = self.imag()
-        return re, im
+        re = self.real(pars)
+        im = self.imag(pars)
+        return np.concatenate((re, im), axis=0)
 
     def dre_drho0(self, pars):
         r"""
@@ -211,6 +211,11 @@ class cc_res():
         nominator = -self.otc * (np.cos(self.ang) + self.otc)
         result = nominator / self.denom
         result *= self.rho0[:, np.newaxis, :]
+        return result
+
+    def dre_dlog10m(self, pars):
+        lin_response = self.dre_dm(pars)
+        result = np.log(10) * self.m * lin_response
         return result
 
     def dre_dtau(self, pars):
@@ -309,6 +314,11 @@ class cc_res():
         nominator = -self.otc * np.sin(self.ang)
         result = nominator / self.denom
         result *= self.rho0[:, np.newaxis, :]
+        return result
+
+    def dim_dlog10m(self, pars):
+        lin_response = self.dim_dm(pars)
+        result = np.log(10) * self.m * lin_response
         return result
 
     def dim_dtau(self, pars):
