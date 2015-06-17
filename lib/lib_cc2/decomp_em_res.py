@@ -1,13 +1,10 @@
-"""Cole-Cole decomposition
+"""Cole-Cole decomposition + EM term
 """
 import numpy as np
 import resistivity
-import NDimInv.model_template as mt
 
-class dec_res(mt.model_template):
-    pass
 
-class decomposition_resistivity():
+class decomposition_em_resistivity():
 
     def __init__(self, settings):
         required_keys = ('frequencies', 'tau', 'c')
@@ -19,6 +16,7 @@ class decomposition_resistivity():
         self.cc = resistivity.cc_res(self.settings['frequencies'])
 
     def _get_full_pars(self, pars_dec):
+        
         # prepare Cole-Cole parameters
         rho0 = pars_dec[0][np.newaxis]
         m = 10 ** pars_dec[1:]
