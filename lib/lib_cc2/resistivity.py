@@ -264,14 +264,17 @@ class cc_res():
         self.set_parameters(pars)
         # term1
         nom1 = - self.m * np.log(self.w * self.tau) * self.otc *\
-            np.cos(self.ang) + self.m * self.otc * (np.pi / 2.0) *\
-            np.sin(self.ang) + np.log(self.w * self.tau) * self.otc
+            np.cos(self.ang) +\
+                self.m * self.otc * (np.pi / 2.0) *\
+            np.sin(self.ang) -\
+                2 * self.m * np.log(self.w * self.tau) *\
+                self.otc2
         term1 = nom1 / self.denom
 
         # term2
-        nom2 = (- self.m * self.otc * (np.cos(self.ang) + self.otc)) *\
-            (- 2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) +
-             2 * self.otc * (np.pi / 2.0) * np.cos(self.ang) +
+        nom2 = (self.m * self.otc * (np.cos(self.ang) + self.otc)) *\
+            (2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) -
+             2 * self.otc * (np.pi / 2.0) * np.sin(self.ang) +
             2 * np.log(self.w * self.tau) * self.otc2)
         term2 = nom2 / self.denom**2
 
@@ -360,8 +363,8 @@ class cc_res():
         term1 = (nom1a + nom1b) / self.denom
 
         # term2
-        nom2 = (- self.m * self.otc * np.sin(self.ang)) *\
-            (2 * np.log(self.w * self.tau) * self.otc -
+        nom2 = (self.m * self.otc * np.sin(self.ang)) *\
+            (2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) -\
              2 * self.otc * (np.pi / 2.0) * np.sin(self.ang) +
              2 * np.log(self.w * self.tau) * self.otc2)
         term2 = nom2 / self.denom**2
