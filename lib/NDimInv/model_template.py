@@ -1,10 +1,15 @@
 """
 Template class for models
+
+Inherit from it when you implement fit models
 """
+import abc
 
 
 class model_template(object):
+    __metaclass__ = abc.ABCMeta
 
+    @abc.abstractmethod
     def __init__(self, settings):
         """
         Parameters
@@ -19,6 +24,7 @@ class model_template(object):
         # set this to None if no data conversion is to done
         self.data_format = None
 
+    @abc.abstractmethod
     def estimate_starting_parameters(self, base_data):
         """Given a data set of base data dimensions, return an initial guess
         (starting parameters) for the inversion.
@@ -36,12 +42,14 @@ class model_template(object):
               '"estimate_starting_parameters(self, base_data)"')
         exit()
 
+    @abc.abstractmethod
     def forward(self, pars):
         """Return the forward response in base dimensions
         """
         print('"forward" function not implemented')
         exit()
 
+    @abc.abstractmethod
     def Jacobian(self, pars):
         r"""Return the Jacobian corresponding to the forward response. The
         Jacobian has the dimensions :math:`B \times D \times M`
@@ -51,6 +59,7 @@ class model_template(object):
         print('"Jacobian" function not implemented')
         exit()
 
+    @abc.abstractmethod
     def get_data_base_size(self):
         """Usually you do not need to modify this.
         """
@@ -58,6 +67,7 @@ class model_template(object):
                     self.get_data_base_dimensions().iteritems()])
         return size
 
+    @abc.abstractmethod
     def get_data_base_dimensions(self):
         """
         Returns
@@ -77,6 +87,7 @@ class model_template(object):
                        }
         return D_base_dims
 
+    @abc.abstractmethod
     def get_model_base_dimensions(self):
         """Return a dict with a description of the model base dimensions. In
         this case we have one dimension: the DD parameters (rho0, mi) where m_i
@@ -85,6 +96,7 @@ class model_template(object):
         M_base_dims = {0: ['rho0_mi', self.tau.size + 1]}
         return M_base_dims
 
+    @abc.abstractmethod
     def compute_par_stats(self, pars):
         r"""For a given parameter set (i.e. a fit result), compute relevant
         statistical values such as :math:`m_{tot}`, :math:`m_{tot}^n`,
