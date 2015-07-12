@@ -5,6 +5,7 @@ To use this module, import * from it:
 
 from NDimInv.plot_helper import *
 """
+import os
 import platform
 
 # Latex support can be activated using an environment variable, otherwise the
