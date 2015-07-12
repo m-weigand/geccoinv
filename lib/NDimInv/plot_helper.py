@@ -15,7 +15,7 @@ import platform
 if('DD_USE_LATEX' in os.environ and os.environ['DD_USE_LATEX'] == '1'):
     use_latex = True
 else:
-    if platform.system == "Windows":
+    if platform.system() == "Windows":
         use_latex = False
     else:
         use_latex = True
