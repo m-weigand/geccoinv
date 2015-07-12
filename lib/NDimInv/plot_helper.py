@@ -5,7 +5,19 @@ To use this module, import * from it:
 
 from NDimInv.plot_helper import *
 """
-use_latex = True
+import platform
+
+# Latex support can be activated using an environment variable, otherwise the
+# default settings are:
+# - for windows: off
+# - else: on
+if('DD_USE_LATEX' in os.environ and os.environ['USE_LATEX'] == '1'):
+    use_latex = True
+else:
+    if platform.system == "Windows":
+        use_latex = False
+    else:
+        use_latex = True
 
 import sys
 already_loaded = 'matplotlib' in sys.modules
@@ -28,12 +40,12 @@ if(mpl.__version__ == '1.3.0'):
     pass
 else:
     pass
-    mpl.rcParams['font.family'] = 'Open Sans'
 mpl.rcParams['mathtext.default'] = 'regular'
 # mpl.rcParams['font.weight'] = 400
 # mpl.rcParams['font.family'] = 'Droid Sans'
 
 if use_latex:
+    mpl.rcParams['font.family'] = 'Open Sans'
     mpl.rcParams['text.usetex'] = True
     mpl.rcParams['text.latex.unicode'] = True
 
