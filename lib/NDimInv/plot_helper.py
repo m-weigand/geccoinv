@@ -12,7 +12,7 @@ import platform
 # default settings are:
 # - for windows: off
 # - else: on
-if('DD_USE_LATEX' in os.environ and os.environ['USE_LATEX'] == '1'):
+if('DD_USE_LATEX' in os.environ and os.environ['DD_USE_LATEX'] == '1'):
     use_latex = True
 else:
     if platform.system == "Windows":
