@@ -48,9 +48,9 @@ class cc_res():
         pars = np.atleast_2d(pars)
 
         nr_pars = (pars.shape[1] - 1) / 3
-        self.rho0 = 10 ** (pars[:, 0])
+        self.rho0 = pars[:, 0]
         self.m = pars[:, 1:nr_pars + 1]
-        self.tau = 10 ** (pars[:, nr_pars + 1: 2 * nr_pars + 1])
+        self.tau = pars[:, nr_pars + 1: 2 * nr_pars + 1]
         self.c = pars[:, 2 * nr_pars + 1:]
 
         # print 'pars', nr_pars
@@ -389,13 +389,17 @@ class cc_res():
         """
         partials = []
 
-        partials.append(self.dre_dlog10rho0(pars)[:, np.newaxis, :])
+        # partials.append(self.dre_dlog10rho0(pars)[:, np.newaxis, :])
+        partials.append(self.dre_drho0(pars)[:, np.newaxis, :])
         partials.append(self.dre_dm(pars))
-        partials.append(self.dre_dlog10tau(pars))
+        # partials.append(self.dre_dlog10tau(pars))
+        partials.append(self.dre_dtau(pars))
         partials.append(self.dre_dc(pars))
-        partials.append(self.dim_dlog10rho0(pars)[:, np.newaxis, :])
+        # partials.append(self.dim_dlog10rho0(pars)[:, np.newaxis, :])
+        partials.append(self.dim_drho0(pars)[:, np.newaxis, :])
         partials.append(self.dim_dm(pars))
-        partials.append(self.dim_dlog10tau(pars))
+        # partials.append(self.dim_dlog10tau(pars))
+        partials.append(self.dim_dtau(pars))
         partials.append(self.dim_dc(pars))
         J = np.concatenate(partials, axis=1)
         return J
