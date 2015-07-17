@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""Cole-Cole decomposition
+"""Cole-Cole decomposition in resistivities
 """
 from NDimInv.plot_helper import *
 import os
@@ -17,7 +17,7 @@ class decomposition_resistivity(lib_dd.base_class.integrated_parameters,
                                 mt.model_template):
 
     def __init__(self, settings):
-        self.data_format = 'rre_rim'
+        self.data_format = 'rre_rmim'
         self.D_base_dims = None
         required_keys = ('Nd', 'tausel', 'frequencies', 'c')
         for key in required_keys:
@@ -217,24 +217,37 @@ class decomposition_resistivity(lib_dd.base_class.integrated_parameters,
         pars_dec: [log10(rho0),
                    log10(m_i)]
 
+        Returns
+        -------
+
+        remim: Nx2 array with N the nr of frequencies, and the real and the
+               negative imaginary parts on the second axis
+
         """
         pars = self._get_full_pars(pars_dec)
         reim = self.cc.reim(pars).T
-        return reim
+        remim = reim
+        remim[:, 1] *= -1
+        return remim
 
     def Jacobian(self, pars_dec):
         """
-        Input parameters:
-            log10(rho0)
-            log10(m)
+        Input parameters
+        ----------------
+        pars_dec: np array containing (log10(rho0), log10(m_i)
+
+        Returns
+        -------
+        J: (2N) X K array with derivatives.
         """
         pars = self._get_full_pars(pars_dec)
         partials = []
 
         # real part
-        real_J = np.concatenate((self.cc.dre_dlog10rho0(pars)[:, np.newaxis, :],
-                                 self.cc.dre_dlog10m(pars)), axis=1)
-        imag_J = np.concatenate((
+        real_J = np.concatenate((
+            self.cc.dre_dlog10rho0(pars)[:, np.newaxis, :],
+            self.cc.dre_dlog10m(pars)), axis=1)
+        imag_J = -np.concatenate((
             self.cc.dim_dlog10rho0(pars)[:, np.newaxis, :],
             self.cc.dim_dlog10m(pars)), axis=1)
         J = np.concatenate((real_J, imag_J), axis=2).T.squeeze()
