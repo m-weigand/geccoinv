@@ -146,7 +146,6 @@ class cc_res():
         result = self.rho0 * (1 - result)
         return result
 
-
     def imag(self, pars):
         r"""Imaginary part
         :math:`\rho''(\omega) = m \frac{ - \rho_0 (\omega \tau)^{c}
@@ -203,8 +202,8 @@ class cc_res():
 
     def dre_dm(self, pars):
         r"""
-        :math:`\frac{\partial \hat{\rho'}(\omega)}{\partial m} = - \rho_0 m (\omega \tau)^c
-        \frac{(cos(\frac{c \pi}{2}) + (\omega \tau)^c)}{1 + 2
+        :math:`\frac{\partial \hat{\rho'}(\omega)}{\partial m} = - \rho_0 m
+        (\omega \tau)^c \frac{(cos(\frac{c \pi}{2}) + (\omega \tau)^c)}{1 + 2
         (\omega \tau)^c cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}}`
         """
         self.set_parameters(pars)
@@ -270,17 +269,17 @@ class cc_res():
         # term1
         nom1 = - self.m * np.log(self.w * self.tau) * self.otc *\
             np.cos(self.ang) +\
-                self.m * self.otc * (np.pi / 2.0) *\
+            self.m * self.otc * (np.pi / 2.0) *\
             np.sin(self.ang) -\
-                2 * self.m * np.log(self.w * self.tau) *\
-                self.otc2
+            2 * self.m * np.log(self.w * self.tau) *\
+            self.otc2
         term1 = nom1 / self.denom
 
         # term2
         nom2 = (self.m * self.otc * (np.cos(self.ang) + self.otc)) *\
             (2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) -
              2 * self.otc * (np.pi / 2.0) * np.sin(self.ang) +
-            2 * np.log(self.w * self.tau) * self.otc2)
+             2 * np.log(self.w * self.tau) * self.otc2)
         term2 = nom2 / self.denom**2
 
         result = term1 + term2
@@ -296,7 +295,7 @@ class cc_res():
         self.set_parameters(pars)
 
         result = np.sum(- self.m * self.otc * np.sin(self.ang) / self.denom,
-                           axis=1)
+                        axis=1)
 
         return result
 
@@ -359,23 +358,23 @@ class cc_res():
         :math:`\frac{\partial \hat{\rho''}(\omega)}{\partial c} = \rho_0
         \frac{-m sin(\frac{c \pi}{2}) ln(\omgea \tau)(\omega \tau)^c - m
         (\omega \tau)^c \frac{\pi}{2} cos(\frac{\pi}{2}}{1 + 2 (\omega \tau)^c
-        cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}} +
-        \rho_0 \frac{\left[-m (\omega \tau)^c cos(\frac{c \pi}{2})
-         \right] \cdot \left[ -2 ln(\omega \tau) (\omega \tau)^c
-        cos(\frac{c \pi}{2}) + 2 (\omega \tau)^c \frac{\pi}{2} cos(\frac{c
-        \pi}{2}) \right] + \left[2 ln(\omega \tau) (\omega \tau)^{2 c}\right]}{\left[1 + 2
-        (\omega \tau)^c cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}\right]^2}`
+        cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}} + \rho_0 \frac{\left[-m
+        (\omega \tau)^c cos(\frac{c \pi}{2}) \right] \cdot \left[ -2 ln(\omega
+        \tau) (\omega \tau)^c cos(\frac{c \pi}{2}) + 2 (\omega \tau)^c
+        \frac{\pi}{2} cos(\frac{c \pi}{2}) \right] + \left[2 ln(\omega \tau)
+        (\omega \tau)^{2 c}\right]}{\left[1 + 2 (\omega \tau)^c cos(\frac{c
+        \pi}{2}) + (\omega \tau)^{2 c}\right]^2}`
         """
         self.set_parameters(pars)
         # term1
-        nom1a = - self.m * np.log(self.w * self.tau) *  self.otc *\
-                np.sin(self.ang)
+        nom1a = - self.m * np.log(self.w * self.tau) * self.otc *\
+            np.sin(self.ang)
         nom1b = - self.m * self.otc * (np.pi / 2.0) * np.cos(self.ang)
         term1 = (nom1a + nom1b) / self.denom
 
         # term2
         nom2 = (self.m * self.otc * np.sin(self.ang)) *\
-            (2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) -\
+            (2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) -
              2 * self.otc * (np.pi / 2.0) * np.sin(self.ang) +
              2 * np.log(self.w * self.tau) * self.otc2)
         term2 = nom2 / self.denom**2
