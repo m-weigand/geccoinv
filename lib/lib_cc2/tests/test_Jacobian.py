@@ -52,3 +52,4 @@ print 'diff_im_tau', diff_im_tau.min(), diff_im_tau.max()
 # diff c
 diff_im_c = Jimnum[3, :] - J.squeeze()[7, :]
 print 'diff_im_c', diff_im_c.min(), diff_im_c.max()
+
