@@ -331,7 +331,7 @@ class ND_Model(object):
         return response
 
     def F(self, M):
-        r"""Return the mode responses in the same dimensionality as D, i.e.
+        r"""Return the model responses in the same dimensionality as D, i.e.
         [base_dimensions, extra_dimensions].
         """
         F = np.zeros_like(self.Data.D)
