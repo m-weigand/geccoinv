@@ -85,7 +85,7 @@ class cc_res():
         # compute some common terms
         self.otc = (self.w * self.tau)**self.c
         self.otc2 = (self.w * self.tau)**(2 * self.c)
-        self.ang = self.c * np.pi / 2  # rad
+        self.ang = self.c * np.pi / 2.0  # rad
         self.denom = 1 + 2 * self.otc * np.cos(self.ang) + self.otc2
 
     def complex(self, pars):
@@ -294,14 +294,15 @@ class cc_res():
         (\omega \tau)^c cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}}`
         """
         self.set_parameters(pars)
-        nominator = - self.m * self.otc * np.sin(self.ang)
-        terms = nominator / self.denom
-        result = np.sum(terms, axis=1)
+
+        result = np.sum(- self.m * self.otc * np.sin(self.ang) / self.denom,
+                           axis=1)
+
         return result
 
     def dim_dlog10rho0(self, pars):
         lin_resp = self.dim_drho0(pars)
-        result = np.log(10) * self.rho0 * lin_resp 
+        result = np.log(10) * self.rho0 * lin_resp
         return result
 
     def dim_dm(self, pars):
