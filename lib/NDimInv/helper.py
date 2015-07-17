@@ -29,7 +29,7 @@ def print_visual_mul(W):
             expression = '0'
         if(expression[0] == '+'):
             expression = expression[1:]
-        print expression
+        print(expression)
 
 
 def print_reg_mat(W):

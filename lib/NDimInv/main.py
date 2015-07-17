@@ -545,7 +545,7 @@ class Inversion(RMS):
         return new_iteration, False
 
     def _add_regularisations(self, A, b, lams, WtWms):
-        """
+        r"""
         Add the regularization terms :math:`\lambda_i
         \underline{\unerline{W}}_{m,i}` to the matrix A and to vector b.
         """
@@ -854,8 +854,8 @@ class Iteration(Inversion):
                 ax.axvline(x=i, color='k', linestyle='dashed', linewidth=0.5)
             ax.set_xlim([0, len(reg_strength)])
             ax.set_xlabel('Parameter number')
-            ylabel = r''.join(('$\lambda \cdot \underline{\underline{W}}^T ',
-                               '\underline{\underline{W}} \underline{m}$'))
+            ylabel = r''.join((r'$\lambda \cdot \underline{\underline{W}}^T ',
+                               r'\underline{\underline{W}} \underline{m}$'))
 
             ax.set_ylabel(ylabel)
             ax.grid(True)

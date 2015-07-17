@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup
+import sys
 import os
 import subprocess
 # from setuptools import find_packages
@@ -22,6 +23,11 @@ try:
 except:
     pass
 
+extra = {}
+if sys.version_info >= (3,):
+    print('V3')
+    extra['use_2to3'] = True
+
 if __name__ == '__main__':
     setup(name='geccoinv',
           version=version_long,
@@ -39,5 +45,6 @@ if __name__ == '__main__':
                     'NDimInv',
                     'sip_formats'],
           scripts=[],
-          install_requires=['numpy', 'scipy>=0.12', 'matplotlib']
+          install_requires=['numpy', 'scipy>=0.12', 'matplotlib'],
+          **extra
           )

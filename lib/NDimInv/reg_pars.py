@@ -116,9 +116,9 @@ class Lcurve(object):
     def plot_lcurve(self, it, WtWms, lams, lam_index, output_prefix):
         rms_values, test_Rm, test_lams = self._sample_lambdas(it, WtWms, lams,
                                                               lam_index)
-        print 'rms_values', rms_values
-        print 'test_Rm', test_Rm
-        print test_lams
+        print('rms_values', rms_values)
+        print('test_Rm', test_Rm)
+        print(test_lams)
         if(test_lams == []):
             print('No test lambdas available, returning')
             return
