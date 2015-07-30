@@ -356,7 +356,7 @@ class cc_res():
     def dim_dc(self, pars):
         r"""
         :math:`\frac{\partial \hat{\rho''}(\omega)}{\partial c} = \rho_0
-        \frac{-m sin(\frac{c \pi}{2}) ln(\omgea \tau)(\omega \tau)^c - m
+        \frac{-m sin(\frac{c \pi}{2}) ln(\omega \tau)(\omega \tau)^c - m
         (\omega \tau)^c \frac{\pi}{2} cos(\frac{\pi}{2}}{1 + 2 (\omega \tau)^c
         cos(\frac{c \pi}{2}) + (\omega \tau)^{2 c}} + \rho_0 \frac{\left[-m
         (\omega \tau)^c cos(\frac{c \pi}{2}) \right] \cdot \left[ -2 ln(\omega
