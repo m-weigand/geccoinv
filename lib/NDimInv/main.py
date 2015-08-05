@@ -795,11 +795,17 @@ class Iteration(Inversion):
 
         for i in range(0, rho0.size, size_m + 1):
             ax1.axvline(x=i, color='k', linestyle='dashed', linewidth=0.5)
-        ylabel_base = r'\left[\underline{\underline{J}}^T '
-        ylabel_base += r'\underline{\underline{W}}_d^T '
-        ylabel_base += r'\underline{\underline{W}}_d (\underline{d} - '
-        ylabel_base += r'\underline{f}(\underline{m})) \right]^{-1}'
-        ax1.set_ylabel('$' + ylabel_base + '$')
+
+        if('DD_USE_LATEX' in os.environ and
+           os.environ['DD_USE_LATEX'] == '1'):
+            ylabel_base = r'\left[\underline{\underline{J}}^T '
+            ylabel_base += r'\underline{\underline{W}}_d^T '
+            ylabel_base += r'\underline{\underline{W}}_d (\underline{d} - '
+            ylabel_base += r'\underline{f}(\underline{m})) \right]^{-1}'
+            ylabel_base = '$' + ylabel_base + '$'
+        else:
+            ylabel_base = '[J^t W_d^T W_d (d - f(m))]^{-1}'
+        ax1.set_ylabel(ylabel_base)
 
         m = reg_strength1
         # mask rho0 values
@@ -854,8 +860,12 @@ class Iteration(Inversion):
                 ax.axvline(x=i, color='k', linestyle='dashed', linewidth=0.5)
             ax.set_xlim([0, len(reg_strength)])
             ax.set_xlabel('Parameter number')
-            ylabel = r''.join((r'$\lambda \cdot \underline{\underline{W}}^T ',
-                               r'\underline{\underline{W}} \underline{m}$'))
+            if('DD_USE_LATEX' in os.environ and
+               os.environ['DD_USE_LATEX'] == '1'):
+                ylabel = r''.join((r'$\lambda \cdot \underline{\underline{W}}^T ',
+                                   r'\underline{\underline{W}} \underline{m}$'))
+            else:
+                ylabel = 'lam W^t W m'
 
             ax.set_ylabel(ylabel)
             ax.grid(True)
