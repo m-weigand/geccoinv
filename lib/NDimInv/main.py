@@ -816,7 +816,7 @@ class Iteration(Inversion):
         # now mark the start of each parameter set
         for i in range(0, m.size, size_m + 1):
             ax2.axvline(x=i, color='k', linestyle='dashed', linewidth=0.5)
-        ax2.set_ylabel('$' + ylabel_base + '$')
+        ax2.set_ylabel(ylabel_base)
 
         ax2.set_xlim([0, len(reg_strength1)])
         ax2.grid(True)
