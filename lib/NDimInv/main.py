@@ -802,9 +802,9 @@ class Iteration(Inversion):
             ylabel_base += r'\underline{\underline{W}}_d^T '
             ylabel_base += r'\underline{\underline{W}}_d (\underline{d} - '
             ylabel_base += r'\underline{f}(\underline{m})) \right]^{-1}'
-            ylabel_base = '$' + ylabel_base + '$'
         else:
             ylabel_base = '[J^t W_d^T W_d (d - f(m))]^{-1}'
+        ylabel_base = '$' + ylabel_base + '$'
         ax1.set_ylabel(ylabel_base)
 
         m = reg_strength1
@@ -865,7 +865,7 @@ class Iteration(Inversion):
                 ylabel = r''.join((r'$\lambda \cdot \underline{\underline{W}}^T ',
                                    r'\underline{\underline{W}} \underline{m}$'))
             else:
-                ylabel = 'lam W^t W m'
+                ylabel = '$lam W^t W m$'
 
             ax.set_ylabel(ylabel)
             ax.grid(True)

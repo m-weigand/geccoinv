@@ -127,7 +127,7 @@ class Lcurve(object):
         ax.loglog(rms_values, test_Rm, '.-', color='k')
         index = 0
         for x, y in zip(rms_values, test_Rm):
-            ax.annotate('{0:.4}'.format(test_lams[index]), xy=(x, y))
+            ax.annotate('{0:.4}'.format(float(test_lams[index])), xy=(x, y))
             index += 1
 
         ax.set_xlim([min(rms_values), max(rms_values)])
@@ -139,9 +139,11 @@ class Lcurve(object):
         fig.savefig(filename + '.png')
 
         # save data to text files
-        np.savetxt(filename + '_rms_values.dat', rms_values)
-        np.savetxt(filename + '_test_Rm.dat', test_Rm)
-        np.savetxt(filename + '_test_lams.dat', test_lams)
+        header = '# lambda Rm RMS\n'
+        output_data = np.vstack((test_lams, test_Rm, rms_values)).T
+        with open(filename + '.dat', 'w') as fid:
+            fid.write(header)
+            np.savetxt(fid, output_data)
 
     def _sample_lambdas(self, it, WtWms, lams, lam_index):
         # these are the lambda values we will test
@@ -151,7 +153,10 @@ class Lcurve(object):
         test_lams = []
         test_Rm = []
 
-        test_lams = list(lams)
+        # here we store the lambda of all regularisation functions we use
+        # we only change one (with index lam_index) for checks in the
+        # l-curve
+        lam_set = list(lams)
 
         # create iteration for each test lambda
         for test_lam in test_lams_raw:
@@ -159,9 +164,9 @@ class Lcurve(object):
                 # try to create an iteration for this lambda
                 print('Test lambda: ', test_lam)
                 test_it = it.copy()
-                test_lams[lam_index] = test_lam
+                lam_set[lam_index] = test_lam
                 # update_m = test_it._model_update((test_lam, ), (WtWm, ))
-                update_m = test_it._model_update(test_lams, WtWms)
+                update_m = test_it._model_update(lam_set, WtWms)
 
                 # we could select an optimal alpha value here
                 # alpha = self.Model.steplength_selector.get_steplength(
@@ -169,8 +174,8 @@ class Lcurve(object):
                 alpha = 1
                 test_it.m = it.m + alpha * update_m
                 test_it.f = test_it.Model.f(test_it.m)
-                test_Rm.append(np.sum(WtWms[lam_index].dot(test_it.m) ** 2))
-
+                Rm = np.sum(WtWms[lam_index].dot(test_it.m) ** 2)
+                test_Rm.append(Rm)
                 test_its.append(test_it)
                 test_lams.append(test_lam)
             except Exception, e:
