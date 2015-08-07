@@ -12,8 +12,8 @@ import subprocess
 
 # TODO: understand the inclusion of requirements
 
-version_short = '0.5'
-version_long = '0.5.4'
+version_short = '0.6'
+version_long = '0.6.0'
 # if we are in a git directory, use the last git commit as the version
 cmd = 'git log -1 --format=%H'
 try:
