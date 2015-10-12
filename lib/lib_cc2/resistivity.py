@@ -29,7 +29,9 @@ class cc_res():
         ----------
 
         pars: MxN array, where M is the number of spectra, and N = 1 + (p * 3)
-              the number of parameters per spectrum, p the number of terms
+              the number of parameters per spectrum, p the number of terms.
+              Parameters are stored sequentially: rho0, m_1, ..., M_p, tau_1,
+              ..., tau_p, c_1, ..., c_p
 
         """
         # check sizes
@@ -67,7 +69,7 @@ class cc_res():
         new_size_reversed = [x for x in reversed(new_size)]
 
         # [nr specs] [nr freqs]
-        new_size_rho0 = (self.rho0.size, self.w_orig.size)
+        # new_size_rho0 = (self.rho0.size, self.w_orig.size)
         new_size_rho0_rev = (self.w_orig.size, self.rho0.size)
 
         self.rho0 = np.resize(self.rho0, new_size_rho0_rev).T
@@ -83,8 +85,8 @@ class cc_res():
         # print 'tau.shape', self.tau.shape
 
         # compute some common terms
-        self.otc = (self.w * self.tau)**self.c
-        self.otc2 = (self.w * self.tau)**(2 * self.c)
+        self.otc = (self.w * self.tau) ** self.c
+        self.otc2 = (self.w * self.tau) ** (2 * self.c)
         self.ang = self.c * np.pi / 2.0  # rad
         self.denom = 1 + 2 * self.otc * np.cos(self.ang) + self.otc2
 
@@ -94,7 +96,7 @@ class cc_res():
         \omega \tau_i)^c_i})\right)`
         """
         self.set_parameters(pars)
-        terms = self.m * (1 - (1 / (1 + (1j * self.w * self.tau)**self.c)))
+        terms = self.m * (1 - (1 / (1 + (1j * self.w * self.tau) ** self.c)))
         # sum up terms
         specs = np.sum(terms, axis=1)
         rho = self.rho0 * (1 - specs)
@@ -230,17 +232,18 @@ class cc_res():
         """
         self.set_parameters(pars)
         # term1
-        nom1 = - self.m * self.c * self.w**self.c * self.tau**(self.c - 1) *\
-            np.cos(self.ang) - self.m * self.w**(2 * self.c) *\
-            2 * self.c * self.tau**(2 * self.c - 1)
+        nom1 = - self.m * self.c * self.w ** self.c * self.tau ** \
+            (self.c - 1) *\
+            np.cos(self.ang) - self.m * self.w ** (2 * self.c) *\
+            2 * self.c * self.tau ** (2 * self.c - 1)
         term1 = nom1 / self.denom
 
         # term2
         nom2 = self.m * self.otc * (np.cos(self.ang) + self.otc) *\
-            (2 * self.w**self.c * self.c * self.tau**(self.c - 1) *
-                np.cos(self.ang) + 2 * self.c * self.w**(2 * self.c) *
-                self.tau**(2 * self.c - 1))
-        term2 = nom2 / self.denom**2
+            (2 * self.w ** self.c * self.c * self.tau ** (self.c - 1) *
+                np.cos(self.ang) + 2 * self.c * self.w ** (2 * self.c) *
+                self.tau ** (2 * self.c - 1))
+        term2 = nom2 / self.denom ** 2
 
         result = term1 + term2
         result *= self.rho0[:, np.newaxis, :]
@@ -280,7 +283,7 @@ class cc_res():
             (2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) -
              2 * self.otc * (np.pi / 2.0) * np.sin(self.ang) +
              2 * np.log(self.w * self.tau) * self.otc2)
-        term2 = nom2 / self.denom**2
+        term2 = nom2 / self.denom ** 2
 
         result = term1 + term2
         result *= self.rho0[:, np.newaxis, :]
@@ -333,16 +336,16 @@ class cc_res():
         """
         self.set_parameters(pars)
         # term1
-        nom1 = - self.m * np.sin(self.ang) * self.w**self.c *\
-            self.c * self.tau**(self.c - 1)
+        nom1 = - self.m * np.sin(self.ang) * self.w ** self.c *\
+            self.c * self.tau ** (self.c - 1)
         term1 = nom1 / self.denom
 
         # term2
         nom2 = (self.m * self.otc * np.sin(self.ang)) *\
-            (2 * self.w**self.c * self.c * self.tau**(self.c - 1) *
-             np.cos(self.ang) + 2 * self.c * self.w**(2 * self.c) *
-             self.tau**(2 * self.c - 1))
-        term2 = nom2 / self.denom**2
+            (2 * self.w ** self.c * self.c * self.tau ** (self.c - 1) *
+             np.cos(self.ang) + 2 * self.c * self.w ** (2 * self.c) *
+             self.tau ** (2 * self.c - 1))
+        term2 = nom2 / self.denom ** 2
 
         result = term1 + term2
         result *= self.rho0[:, np.newaxis, :]
@@ -377,7 +380,7 @@ class cc_res():
             (2 * np.log(self.w * self.tau) * self.otc * np.cos(self.ang) -
              2 * self.otc * (np.pi / 2.0) * np.sin(self.ang) +
              2 * np.log(self.w * self.tau) * self.otc2)
-        term2 = nom2 / self.denom**2
+        term2 = nom2 / self.denom ** 2
         result = term1 + term2
 
         result *= self.rho0[:, np.newaxis, :]
