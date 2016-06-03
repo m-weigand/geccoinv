@@ -64,7 +64,7 @@ class test_input_styles(object):
                                                      data_converted, one_spec)
             numpy.testing.assert_almost_equal(
                 data, data_backconverted,
-                decimal=5)
+                decimal=4)
 
 
 class test_converters():

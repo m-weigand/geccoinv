@@ -52,6 +52,18 @@ def generic_magpha_to_reim(mag, pha):
 ####################
 
 
+def from_ccomplex(data):
+    cre = np.real(data)
+    cim = np.imag(data)
+    return cre, cim
+
+def from_rcomplex(data):
+    rre = np.real(data)
+    Y = 1.0 / data
+    cre = np.real(Y)
+    cim = np.imag(Y)
+    return cre, cim
+
 def from_cre_cim(data):
     cre, cim = split_data(data)
     return cre, cim
@@ -177,6 +189,13 @@ def to_lnrmag_rpha(cre, cim):
     lnrmag_rpha[:, mag_slice] = np.log(rmag_rpha[:, mag_slice])
     return lnrmag_rpha
 
+def to_ccomplex(cre, cim):
+    return cre + 1j * cim
+
+def to_rcomplex(cre, cim):
+    Y = cre + 1j * cim
+    Z = 1.0 / Y
+    return Z
 
 # store the converter functions in dicts
 from_converters = {
@@ -187,7 +206,9 @@ from_converters = {
     'rre_rmim': from_rre_rmim,
     'cmag_cpha': from_cmag_cpha,
     'cre_cim': from_cre_cim,
-    'cre_cmim': from_cre_cmim
+    'cre_cmim': from_cre_cmim,
+    'ccomplex': from_ccomplex,
+    'rcomplex': from_rcomplex,
 }
 
 to_converters = {
@@ -198,7 +219,9 @@ to_converters = {
     'rre_rmim': to_rre_rmim,
     'cmag_cpha': to_cmag_cpha,
     'cre_cim': to_cre_cim,
-    'cre_cmim': to_cre_cmim
+    'cre_cmim': to_cre_cmim,
+    'ccomplex': to_ccomplex,
+    'rcomplex': to_rcomplex,
 }
 
 
@@ -225,6 +248,8 @@ def convert(input_format, output_format, data, one_spectrum=False):
         'cmag_cpha'
         'cre_cim'
         'cre_cmim'
+        'ccomplex'
+        'rcomplex'
 
     Array format
     ------------
