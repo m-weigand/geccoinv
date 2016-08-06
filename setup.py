@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup
 import sys
-import os
-import subprocess
 # from setuptools import find_packages
 # find_packages
 
@@ -11,17 +9,8 @@ import subprocess
 # to create a windows installer
 
 # TODO: understand the inclusion of requirements
-
 version_short = '0.8'
 version_long = '0.8.0'
-# if we are in a git directory, use the last git commit as the version
-cmd = 'git log -1 --format=%H'
-try:
-    if os.path.isdir('.git'):
-        git_output = subprocess.check_output(cmd, shell=True).strip()
-        version_long += '+' + git_output
-except:
-    pass
 
 extra = {}
 if sys.version_info >= (3,):
