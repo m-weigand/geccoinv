@@ -16,14 +16,14 @@ def get_weighting_re_vs_im(base_data):
     """
     work_data = base_data.flatten(order='F')
 
-    center = work_data.size / 2
+    center = int(work_data.size / 2)
     re = work_data[0: center]
     im = work_data[center:]
 
     re_mean = np.mean(np.abs(re))
     im_mean = np.mean(np.abs(im))
 
-    factor_im = re_mean / im_mean
+    factor_im = int(re_mean / im_mean)
     errors = np.ones(work_data.shape)
     errors[center:] *= factor_im
 

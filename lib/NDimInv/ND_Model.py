@@ -61,7 +61,8 @@ class ND_Model(object):
         This function provides the slices in the same order as an oder='F'
         argument for .flatten().
         """
-        all_indices = [range(0, x[1][1]) for x in self.extra_dims.iteritems()]
+        # TODO: should this be something like iteritems ?
+        all_indices = [range(0, x[1][1]) for x in self.extra_dims.items()]
         extra_indices = itertools.product(*all_indices)
 
         # create slices for the base dimensions, corresponds to a list of ':'

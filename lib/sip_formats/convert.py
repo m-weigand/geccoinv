@@ -21,7 +21,7 @@ def split_data(data, squeeze=False):
     squeeze : squeeze results to remove unnecessary dimensions
     """
     vdata = np.atleast_2d(data)
-    nr_freqs = vdata.shape[1] / 2
+    nr_freqs = int(vdata.shape[1] / 2)
     part1 = vdata[:, 0:nr_freqs]
     part2 = vdata[:, nr_freqs:]
     if(squeeze):
@@ -57,12 +57,14 @@ def from_ccomplex(data):
     cim = np.imag(data)
     return cre, cim
 
+
 def from_rcomplex(data):
-    rre = np.real(data)
+    # rre = np.real(data)
     Y = 1.0 / data
     cre = np.real(Y)
     cim = np.imag(Y)
     return cre, cim
+
 
 def from_cre_cim(data):
     cre, cim = split_data(data)
@@ -189,8 +191,10 @@ def to_lnrmag_rpha(cre, cim):
     lnrmag_rpha[:, mag_slice] = np.log(rmag_rpha[:, mag_slice])
     return lnrmag_rpha
 
+
 def to_ccomplex(cre, cim):
     return cre + 1j * cim
+
 
 def to_rcomplex(cre, cim):
     Y = cre + 1j * cim
@@ -255,9 +259,9 @@ def convert(input_format, output_format, data, one_spectrum=False):
     ------------
 
     data is either 1D or 2D. A 1D array correspond to one spectrum, with double
-    the size of the frequencies (which are not needed for the conversion). Thus,
-    the first halt either comprises a magnitude data, and the second one phase
-    data, or the parts comprise real and imaginary parts.
+    the size of the frequencies (which are not needed for the conversion).
+    Thus, the first halt either comprises a magnitude data, and the second one
+    phase data, or the parts comprise real and imaginary parts.
 
     For the 2D case there exist two possibilities:
 
