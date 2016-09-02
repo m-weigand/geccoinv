@@ -22,11 +22,16 @@ class ND_Data(object):
     """
     Data related functions
     """
-    def __init__(self, model, extra_dims):
+    def __init__(self, model, extra_dims, data_weighting_key):
         self.D = None
         self.obj = model
 
         self.data_converter = None
+        if data_weighting_key not in data_weighting.functions:
+            raise Exception('data weighting scheme "{0}" is not known!'.format(
+                data_weighting_key
+            ))
+        self.data_weighting_func = data_weighting.functions[data_weighting_key]
 
         # #### model side ####
         self.D_base_dims = self.obj.get_data_base_dimensions()
@@ -100,12 +105,14 @@ class ND_Data(object):
 
     def WD(self):
         """
-
+        Assemble the data weighting matrix using one of the available data
+        weighting functions
         """
         WD = np.zeros_like(self.D)
         for slice_d in self.D_iterator():
-            weightings = data_weighting.get_weighting_re_vs_im(
-                self.D[slice_d])
+            weightings = self.data_weighting_func(
+                self.D[slice_d]
+            )
             # weightings = data_weighting.get_weighting_one(basedata)
             # weightings = data_weighting.get_weighting_all_to_one(basedata)
             # weightings = data_weighting.get_weighting_rel_abs(

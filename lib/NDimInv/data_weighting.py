@@ -35,7 +35,7 @@ def get_weighting_all_to_one(base_data):
     """
     Return a weighting vector which 'normalizes' all data points to one
     """
-    errors = 1 / base_data
+    errors = 1.0 / base_data
     return errors
 
 
@@ -48,4 +48,12 @@ def get_weighting_rel_abs(base_data):
 
 
 def get_weighting_one(base_data):
-    return np.ones(base_data.size)
+    return np.ones(base_data.shape)
+
+
+functions = {
+    're_vs_im': get_weighting_re_vs_im,
+    'one': get_weighting_one,
+    'all_to_one': get_weighting_all_to_one,
+    'rel_abs_error': get_weighting_rel_abs,
+}

@@ -962,7 +962,16 @@ class NDimInv(InversionControl):
         """
         After all dimensions were added, create the Data space
         """
-        self.Data = ND_Data.ND_Data(self.model, self.extra_dims)
+        data_weighting_function = self.settings.get(
+            'data_weighting',
+            None,
+        )
+
+        self.Data = ND_Data.ND_Data(
+            self.model,
+            self.extra_dims,
+            data_weighting_function,
+        )
 
     def set_custom_plot_func(self, plot_obj):
         """
