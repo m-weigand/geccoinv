@@ -862,8 +862,10 @@ class Iteration(Inversion):
             ax.set_xlabel('Parameter number')
             if('DD_USE_LATEX' in os.environ and
                os.environ['DD_USE_LATEX'] == '1'):
-                ylabel = r''.join((r'$\lambda \cdot \underline{\underline{W}}^T ',
-                                   r'\underline{\underline{W}} \underline{m}$'))
+                ylabel = r''.join((
+                    r'$\lambda \cdot \underline{\underline{W}}^T ',
+                    r'\underline{\underline{W}} \underline{m}$'
+                ))
             else:
                 ylabel = '$lam W^t W m$'
 
