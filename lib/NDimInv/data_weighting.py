@@ -11,8 +11,8 @@ def get_weighting_re_vs_im(base_data):
 
     :math:`W_{im} = \frac{\overline{|re|}}{\overline{|im|}}`
 
-    The base_data must be 1D and the first half contains the real parts, while
-    the second half contains the imaginary parts
+    We assume that base_data is of shape (N, 2) with (N, 0) the real parts, (N,
+    1) the imaginary parts
     """
     work_data = base_data.flatten(order='F')
 
@@ -23,7 +23,7 @@ def get_weighting_re_vs_im(base_data):
     re_mean = np.mean(np.abs(re))
     im_mean = np.mean(np.abs(im))
 
-    factor_im = int(re_mean / im_mean)
+    factor_im = re_mean / im_mean
     errors = np.ones(work_data.shape)
     errors[center:] *= factor_im
 
