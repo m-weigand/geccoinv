@@ -889,8 +889,12 @@ def load_regular_elem_file(filename):
         # TODO: This is a no-go if we ever encounter rectangular grids with
         #       topography
         xcoordinates = nodes[range(0, width_in_nodes), 1]
-        ycoordinates = nodes[range(0, width_in_nodes * height_in_nodes,
-                                   width_in_nodes), 2]
+        ycoordinates = nodes[range(
+            0,
+            int(width_in_nodes * height_in_nodes),
+            width_in_nodes),
+            2
+        ]
 
         meshx, meshy = np.meshgrid(xcoordinates, ycoordinates)
 
