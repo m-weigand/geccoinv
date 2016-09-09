@@ -1,5 +1,6 @@
 *.pyc
 build/
+deb_dist/
 dist/
 MANIFEST
 DebyeDecomposition.egg-info
