@@ -20,7 +20,12 @@ if sys.version_info >= (3,):
 if __name__ == '__main__':
     setup(name='geccoinv',
           version=version_long,
-          description='Multi dimensional geophysical inversion framework',
+          description=''.join((
+              'Multi dimensional geophysical inversion framework. ',
+              'Note: only for use with the ccd package. If you are looking ',
+              'for a general inversion framework, try pyGimli ',
+              '(www.pygimli.org)',
+          )),
           author='Maximilian Weigand',
           author_email='mweigand@geo.uni-bonn.de',
           url='http://www.geo.uni-bonn.de',
