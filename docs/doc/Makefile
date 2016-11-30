@@ -45,8 +45,6 @@ html:
 	# regenerate api
 	rm -rf api
 	sphinx-apidoc -T -o api ../../lib/NDimInv/
-	sphinx-apidoc -T -o api ../../lib/lib_cc/
-	sphinx-apidoc -T -o api ../../lib/lib_cc2/
 	sphinx-apidoc -T -o api ../../lib/sip_formats/
 
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

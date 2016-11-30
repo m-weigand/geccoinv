@@ -51,8 +51,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'GeccoInv - time lapse Debye decomposition routines'
-copyright = u'2014, Maximilian Weigand'
+project = u'GeccoInv - time lapse Cole-Cole decomposition routines'
+copyright = u'2014-2016, Maximilian Weigand'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
