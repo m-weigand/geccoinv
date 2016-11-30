@@ -33,11 +33,10 @@ if __name__ == '__main__':
           # msi # installer
           # packages=find_packages(),
           package_dir={'': 'lib'},
-          packages=['lib_cc',
-                    'lib_cc2',
-                    'lib_cc_conductivity',
-                    'NDimInv',
-                    'sip_formats'],
+          packages=[
+              'NDimInv',
+              'sip_formats',
+          ],
           scripts=[],
           install_requires=['numpy', 'scipy>=0.12', 'matplotlib'],
           **extra
