@@ -5,6 +5,66 @@ To use this module, import * from it:
 
 from NDimInv.plot_helper import *
 """
+
+
+def setup():
+    """import the matplotlib modules and set the style
+
+    Returns
+    -------
+    plt: pylab
+        imported pylab module
+    mpl: matplotlib module
+        imported matplotlib module
+
+    """
+    import sys
+    already_loaded = 'matplotlib' in sys.modules
+
+    # just make sure we can access matplotlib as mpl
+    import matplotlib as mpl
+
+    if not already_loaded:
+        mpl.use('Agg')
+
+    import matplotlib.pyplot as plt
+
+    plt.style.use('seaborn')
+
+    # general settings
+    mpl.rcParams['font.size'] = 7.0
+    mpl.rcParams['axes.labelsize'] = 7.0
+    mpl.rcParams['xtick.labelsize'] = 7.0
+    mpl.rcParams['ytick.labelsize'] = 7.0
+    mpl.rcParams["lines.linewidth"] = 1.5
+    mpl.rcParams["lines.markeredgewidth"] = 3.0
+    mpl.rcParams["lines.markersize"] = 3.0
+    # mpl.rcParams['font.sans-serif'] = 'Droid Sans'
+
+    # mpl.rcParams['font.family'] = 'Open Sans'
+    # mpl.rcParams['font.weight'] = 400
+    mpl.rcParams['mathtext.default'] = 'regular'
+
+    # mpl.rcParams['font.family'] = 'Droid Sans'
+
+    mpl.rcParams['text.usetex'] = True
+    mpl.rcParams['text.latex.unicode'] = True
+
+    mpl.rc(
+        'text.latex',
+        preamble=''.join((
+            # r'\usepackage{droidsans}',
+            # r'\usepackage[T1]{fontenc} ',
+            r'\usepackage{sfmath} \renewcommand{\rmfamily}{\sffamily}',
+            r'\renewcommand\familydefault{\sfdefault} ',
+            # r'\usepackage{mathastext} '
+        ))
+    )
+    import mpl_toolkits.axes_grid1 as axes_grid1
+    axes_grid1
+    return plt, mpl
+
+
 import os
 import platform
 
