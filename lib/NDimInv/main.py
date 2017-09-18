@@ -1,5 +1,4 @@
-"""
-Copyright 2014 Maximilian Weigand
+""" Copyright 2014-2017 Maximilian Weigand
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -646,8 +645,7 @@ class Inversion(RMS):
 
 
 class Iteration(Inversion):
-    """
-    This class holds all information of one iteration
+    """ This class holds all information of one iteration
     """
     def __init__(self, nr, Data, Model, RMS, settings):
         """
@@ -674,22 +672,32 @@ class Iteration(Inversion):
         self.lams = None
         self.statpars = None
 
-    def plot(self, filename='iteration', **kwargs):
-        output_filename = "plot_"
-        if('global_prefix' in self.Model.obj.settings):
-            output_filename += self.Model.obj.settings['global_prefix']
-        else:
-            pass
-
-        output_filename += filename + '{0:04}.png'.format(self.nr)
+    def plot(self, filename=None, **kwargs):
         if(self.Model.custom_plot_func is None):
-            self._plot_default(output_filename)
+            fig = self._plot_default(output_filename)
         else:
-            self.Model.custom_plot_func.plot(self, output_filename, **kwargs)
+            fig = self.Model.custom_plot_func.plot(
+                it=self, **kwargs
+            )
 
-    def _plot_default(self, filename):
-        """
-        Default plot routine for complex resistivity data
+        if filename is not None:
+            output_filename = "plot_"
+            if('global_prefix' in self.Model.obj.settings):
+                output_filename += self.Model.obj.settings['global_prefix']
+            else:
+                pass
+
+            output_filename += filename + '{0:04}.png'.format(self.nr)
+
+            fig.savefig(filename, dpi=150)
+            fig.clf()
+            plt.close(fig)
+            del(fig)
+        else:
+            return fig
+
+    def _plot_default(self):
+        """ Default plot routine for complex resistivity data
         """
         response = self.Model.f(self.m)
         d = self.Data.Df
@@ -722,14 +730,10 @@ class Iteration(Inversion):
             ax.semilogx(self.Data.obj.frequencies, resp[i + 1], '.-', c='r')
 
         fig.suptitle(self.nr)
-        fig.savefig(filename, dpi=150)
-        fig.clf()
-        plt.close(fig)
-        del(fig)
+        return fig
 
     def copy(self):
-        """
-        Return a copy of this instance. This copy is not a full copy,
+        """ Return a copy of this instance. This copy is not a full copy,
         self.Data/self.Model will only be copied by reference. Thus if you
         change them here they will be changed everywhere.
         """
@@ -748,8 +752,7 @@ class Iteration(Inversion):
 
     @property
     def stat_pars(self):
-        """
-        Aggregate statistical parameters for this iteration and return a
+        """ Aggregate statistical parameters for this iteration and return a
         dictionary
         """
         self.statpars = {}
@@ -904,8 +907,7 @@ class Iteration(Inversion):
 
 
 class NDimInv(InversionControl):
-    """
-    N-dimensional model inversion for SIP-Spectra
+    """ N-dimensional model inversion for SIP-Spectra
 
     Data parameters
     ===============
@@ -1002,21 +1004,18 @@ class NDimInv(InversionControl):
 
     @property
     def nr_base_dims(self):
-        """
-        Return number of base dimensions
+        """ Return number of base dimensions
         """
         return self._get_nr_dims(self.D_base_dims)
 
     @property
     def nr_extra_dims(self):
-        """
-        Return number of extra dimensions
+        """ Return number of extra dimensions
         """
         return self._get_nr_dims(self.extra_dims)
 
     def add_new_dimension(self, description, size):
-        """
-        Add a new extra dimension to the inversion.
+        """ Add a new extra dimension to the inversion.
 
         Extra dimensions are added both to data and model space.
 
@@ -1033,16 +1032,14 @@ class NDimInv(InversionControl):
         self.extra_dims[next_dim_nr] = [description, size]
 
     def _print_data_dimension_information(self, dim_dict):
-        """
-        Print information regarding a dimension dict (e.g. base or extra)
+        """ Print information regarding a dimension dict (e.g. base or extra)
         """
         for key in dim_dict.keys():
             print('{0} {1} [{2} values]'.format(key, dim_dict[key][0],
                                                 dim_dict[key][1]))
 
     def overview_data(self):
-        """
-        Print information regarding the data space self.D
+        """ Print information regarding the data space self.D
         """
         print('\n\nDimension Information\n\n')
         print('base dimensions')
