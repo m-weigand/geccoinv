@@ -47,19 +47,20 @@ def setup():
 
     # mpl.rcParams['font.family'] = 'Droid Sans'
 
-    mpl.rcParams['text.usetex'] = True
-    mpl.rcParams['text.latex.unicode'] = True
+    if os.environ.get('DD_USE_LATEX', '0') == '1':
+        mpl.rcParams['text.usetex'] = True
+        mpl.rcParams['text.latex.unicode'] = True
 
-    mpl.rc(
-        'text.latex',
-        preamble=''.join((
-            # r'\usepackage{droidsans}',
-            # r'\usepackage[T1]{fontenc} ',
-            r'\usepackage{sfmath} \renewcommand{\rmfamily}{\sffamily}',
-            r'\renewcommand\familydefault{\sfdefault} ',
-            # r'\usepackage{mathastext} '
-        ))
-    )
+        mpl.rc(
+            'text.latex',
+            preamble=''.join((
+                # r'\usepackage{droidsans}',
+                # r'\usepackage[T1]{fontenc} ',
+                r'\usepackage{sfmath} \renewcommand{\rmfamily}{\sffamily}',
+                r'\renewcommand\familydefault{\sfdefault} ',
+                # r'\usepackage{mathastext} '
+            ))
+        )
     import mpl_toolkits.axes_grid1 as axes_grid1
     axes_grid1
     return plt, mpl
