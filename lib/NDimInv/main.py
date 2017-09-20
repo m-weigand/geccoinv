@@ -677,7 +677,7 @@ class Iteration(Inversion):
 
     def plot(self, filename=None, **kwargs):
         fig = None
-        if(self.Model.custom_plot_func is None):
+        if self.Model.custom_plot_func is None:
             fig = self._plot_default()
         else:
             fig = self.Model.custom_plot_func.plot(
@@ -696,7 +696,6 @@ class Iteration(Inversion):
             fig.savefig(filename, dpi=150)
             fig.clf()
             plt.close(fig)
-            del(fig)
         else:
             return fig
 

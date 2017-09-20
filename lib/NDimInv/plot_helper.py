@@ -25,7 +25,6 @@ def setup():
     # the default settings are:
     # - for windows: off
     # - else: on
-    print(os.environ.get('DD_USE_LATEX'))
     use_latex = False
     if('DD_USE_LATEX' in os.environ):
         if os.environ['DD_USE_LATEX'] == '1':
@@ -34,7 +33,6 @@ def setup():
         if platform.system() == "Windows":
             use_latex = False
         else:
-            print('setting true')
             use_latex = True
 
     already_loaded = 'matplotlib' in sys.modules
@@ -66,7 +64,6 @@ def setup():
     # mpl.rcParams['font.family'] = 'Droid Sans'
 
     if use_latex:
-        print('activating latex suppport')
         mpl.rcParams['text.usetex'] = True
         mpl.rcParams['text.latex.unicode'] = True
 
