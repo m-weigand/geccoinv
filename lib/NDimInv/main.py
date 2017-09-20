@@ -15,15 +15,18 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 # from memory_profiler import *
 import os
 import logging
+import json
+
 import scipy.sparse as sparse
 import scipy.sparse.linalg as SL
 import numpy as np
-import json
+
 import ND_Model
 import ND_Data
-from plot_helper import *
-import reg_pars
-import helper
+import NDimInv.plot_helper
+plt, mpl = NDimInv.plot_helper.setup()
+import NDimInv.reg_pars as reg_pars
+import NDimInv.helper as helper
 helper
 log = logging.getLogger(__name__)
 
@@ -673,8 +676,9 @@ class Iteration(Inversion):
         self.statpars = None
 
     def plot(self, filename=None, **kwargs):
+        fig = None
         if(self.Model.custom_plot_func is None):
-            fig = self._plot_default(output_filename)
+            fig = self._plot_default()
         else:
             fig = self.Model.custom_plot_func.plot(
                 it=self, **kwargs

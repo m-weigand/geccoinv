@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Import all necessary Matplotlib modules and set default options
-To use this module, import * from it:
+""" Import all necessary matplotlib modules and set default options To use this
+module, import it as:
 
-from NDimInv.plot_helper import *
+import NDimInv.plot_helper
+plt, mpl = NDimInv.plot_helper.setup()
 """
+import os
+import sys
+import platform
 
 
 def setup():
@@ -18,7 +21,22 @@ def setup():
         imported matplotlib module
 
     """
-    import sys
+    # Latex support can be activated using an environment variable, otherwise
+    # the default settings are:
+    # - for windows: off
+    # - else: on
+    print(os.environ.get('DD_USE_LATEX'))
+    use_latex = False
+    if('DD_USE_LATEX' in os.environ):
+        if os.environ['DD_USE_LATEX'] == '1':
+            use_latex = True
+    else:
+        if platform.system() == "Windows":
+            use_latex = False
+        else:
+            print('setting true')
+            use_latex = True
+
     already_loaded = 'matplotlib' in sys.modules
 
     # just make sure we can access matplotlib as mpl
@@ -47,7 +65,8 @@ def setup():
 
     # mpl.rcParams['font.family'] = 'Droid Sans'
 
-    if os.environ.get('DD_USE_LATEX', '0') == '1':
+    if use_latex:
+        print('activating latex suppport')
         mpl.rcParams['text.usetex'] = True
         mpl.rcParams['text.latex.unicode'] = True
 
@@ -61,69 +80,11 @@ def setup():
                 # r'\usepackage{mathastext} '
             ))
         )
+    else:
+        mpl.rcParams['text.usetex'] = False
     import mpl_toolkits.axes_grid1 as axes_grid1
     axes_grid1
     return plt, mpl
-
-
-import os
-import platform
-
-# Latex support can be activated using an environment variable, otherwise the
-# default settings are:
-# - for windows: off
-# - else: on
-if('DD_USE_LATEX' in os.environ and os.environ['DD_USE_LATEX'] == '1'):
-    use_latex = True
-else:
-    if platform.system() == "Windows":
-        use_latex = False
-    else:
-        use_latex = True
-
-import sys
-already_loaded = 'matplotlib' in sys.modules
-
-# just make sure we can access matplotlib as mpl
-import matplotlib as mpl
-if(not already_loaded):
-    mpl.use('Agg')
-version_strings = [x for x in mpl.__version__.split('.')]
-version = [int(version_strings[0]), int(version_strings[1])]
-
-# general settings
-mpl.rcParams["lines.linewidth"] = 2.0
-mpl.rcParams["lines.markeredgewidth"] = 3.0
-mpl.rcParams["lines.markersize"] = 3.0
-mpl.rcParams["font.size"] = 12
-
-# hack-around for https://github.com/matplotlib/matplotlib/pull/2012
-if(mpl.__version__ == '1.3.0'):
-    pass
-else:
-    pass
-mpl.rcParams['mathtext.default'] = 'regular'
-# mpl.rcParams['font.weight'] = 400
-# mpl.rcParams['font.family'] = 'Droid Sans'
-
-if use_latex:
-    mpl.rcParams['font.family'] = 'Open Sans'
-    mpl.rcParams['text.usetex'] = True
-    mpl.rcParams['text.latex.unicode'] = True
-
-# sans-serif fonts
-if(False):
-    preamble = r'\usepackage{droidsans}\usepackage[T1]{fontenc} '
-    preamble += r'\usepackage{sfmath} \renewcommand{\rmfamily}{\sffamily} '
-    preamble += r'\renewcommand\familydefault{\sfdefault} '
-    preamble += r'\usepackage{mathastext} '
-    mpl.rc('text.latex', preamble=preamble)
-
-import matplotlib.pyplot as plt
-plt
-
-import mpl_toolkits.axes_grid1 as axes_grid1
-axes_grid1
 
 
 def mpl_get_cb_bound_next_to_plot(ax):

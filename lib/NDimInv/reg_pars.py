@@ -1,3 +1,4 @@
+# *-* coding: utf-8 *-*
 """
 initial :math:`\lambda` value :math:`\lambda_0`
 -----------------------------------------------
@@ -30,13 +31,15 @@ Not implemented (yet):
 * Line search
 
 * L-curve (not implemented as an automatic :math:`\lambda` selector
-
 """
 import sys
-from plot_helper import *
+import itertools
+
 import scipy.sparse as sparse
 import numpy as np
-import itertools
+
+import NDimInv.plot_helper
+plt, mpl = NDimInv.plot_helper.setup()
 
 
 class Lam0_Fixed(object):
@@ -178,7 +181,7 @@ class Lcurve(object):
                 test_Rm.append(Rm)
                 test_its.append(test_it)
                 test_lams.append(test_lam)
-            except Exception, e:
+            except Exception as e:
                 print('There was an error in the lambda test for ' +
                       'lambda: {0}. Trying next lambda.'.format(test_lam))
                 print(e)
@@ -237,7 +240,7 @@ class SearchLambdaIndividual(BaseLambda):
         lambdas = []
 
         for nr, extra_index in enumerate(itertools.product(*e_indices)):
-            print 'index', extra_index
+            print('index', extra_index)
 
             # create an iteration with only this spectrum
             it_indiv = it.copy()
@@ -329,7 +332,7 @@ class SearchLambda(BaseLambda):
                 print('There was an error in the lambda test for ' +
                       'lambda: {0}. Trying next lambda.'.format(test_lam))
                 e = sys.exc_info()[0]
-                print e
+                print(e)
                 continue
 
         # aggregate all RMS values
