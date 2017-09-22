@@ -977,6 +977,7 @@ class NDimInv(InversionControl):
             self.model,
             self.extra_dims,
             data_weighting_function,
+            self.settings,
         )
 
     def set_custom_plot_func(self, plot_obj):

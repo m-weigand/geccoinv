@@ -20,9 +20,16 @@ import NDimInv.data_weighting as data_weighting
 class ND_Data(object):
     """ Data related functions
     """
-    def __init__(self, model, extra_dims, data_weighting_key):
+    def __init__(self, model, extra_dims, data_weighting_key, settings):
+        """
+        Parameters
+        ----------
+        settings: dict
+            global settings dict
+        """
         self.D = None
         self.obj = model
+        self.settings = settings
 
         self.data_converter = None
         if data_weighting_key not in data_weighting.functions:
@@ -108,7 +115,8 @@ class ND_Data(object):
         WD = np.zeros_like(self.D)
         for slice_d in self.D_iterator():
             weightings = self.data_weighting_func(
-                self.D[slice_d]
+                self.D[slice_d],
+                settings=self.settings,
             )
             WD[slice_d] = weightings
         return WD
