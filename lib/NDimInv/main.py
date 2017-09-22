@@ -966,8 +966,7 @@ class NDimInv(InversionControl):
                 exit()
 
     def finalize_dimensions(self):
-        """
-        After all dimensions were added, create the Data space
+        """ After all dimensions are added, create the Data space
         """
         data_weighting_function = self.settings.get(
             'data_weighting',

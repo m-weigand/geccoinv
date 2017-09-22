@@ -1,6 +1,5 @@
-"""
-Collection of helper functions which generate weightings for various base data
-sets
+""" Collection of helper functions which generate weightings for various base
+data sets
 """
 import numpy as np
 

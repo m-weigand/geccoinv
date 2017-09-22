@@ -1,5 +1,4 @@
-"""
-Copyright 2014 Maximilian Weigand
+""" Copyright 2014-2017 Maximilian Weigand
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -15,12 +14,11 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import numpy as np
 import itertools
-import data_weighting
+import NDimInv.data_weighting as data_weighting
 
 
 class ND_Data(object):
-    """
-    Data related functions
+    """ Data related functions
     """
     def __init__(self, model, extra_dims, data_weighting_key):
         self.D = None
@@ -48,14 +46,14 @@ class ND_Data(object):
         self.extra_mask = None
 
     def _check_position_with_dimensions(self, extra_position):
-        """
-        Check if the provided position lies within the registered extra
+        """ Check if the provided position lies within the registered extra
         dimensional space
 
         Parameters
         ----------
-        extra_position : list/tuple of extra dimensions. If no extra dimensions
-                         are used, None has to be used.
+        extra_position : list/tuple
+            list of extra dimensions. If no extra dimensions are used, None has
+            to be used.
         """
         # are there any extra dimensions?
         if(len(extra_position) == 0):
@@ -104,8 +102,7 @@ class ND_Data(object):
             yield sd
 
     def WD(self):
-        """
-        Assemble the data weighting matrix using one of the available data
+        """ Assemble the data weighting matrix using one of the available data
         weighting functions
         """
         WD = np.zeros_like(self.D)
@@ -113,10 +110,6 @@ class ND_Data(object):
             weightings = self.data_weighting_func(
                 self.D[slice_d]
             )
-            # weightings = data_weighting.get_weighting_one(basedata)
-            # weightings = data_weighting.get_weighting_all_to_one(basedata)
-            # weightings = data_weighting.get_weighting_rel_abs(
-            #   self.D[slice_d])
             WD[slice_d] = weightings
         return WD
 
@@ -128,8 +121,12 @@ class ND_Data(object):
 
     @property
     def Df(self):
-        """
-        Return a flattened version of D (data vector)
+        """ Return a flattened version of D (data vector)
+
+        Returns
+        -------
+        Df: numpy.ndarray
+            flattened version of the data vector
         """
         D = self.D
         if(self.extra_mask is not None):
@@ -141,8 +138,7 @@ class ND_Data(object):
 
     @property
     def base_length(self):
-        """
-        Return the length of the base dimensions in a flattened state
+        """ Return the length of the base dimensions in a flattened state
         """
         if(self._base_length is None):
             lengths = [x[1][1] for x in self.D_base_dims.iteritems()]
@@ -154,9 +150,8 @@ class ND_Data(object):
         return self._base_length
 
     def _allocate_D(self):
-        """
-        Allocate the array for self.D according to the dimensions and numbers
-        in self.D_base_dims and self.extra_dims
+        """ Allocate the array for self.D according to the dimensions and
+        numbers in self.D_base_dims and self.extra_dims
 
         This function must only be called once after all dimensions were added.
         """
@@ -174,16 +169,17 @@ class ND_Data(object):
         self.D = np.zeros(new_shape)
 
     def add_data(self, data, data_format, extra):
-        """
-        Add data to the data space
+        """ Add data to the data space
 
         Parameters
         ----------
-        data : ndarray corresponding to base dimensions
-        data_format : data format as found in sip_convert
-        extra : this tuple/list provides the position in the extra dimensional
-                space for the data set. Use None if no extra dimensions are
-                use.
+        data: np.ndarray
+            corresponding to base dimensions
+        data_format: string
+            data format as found in sip_convert
+        extra: tuple/list
+            this tuple/list provides the position in the extra dimensional
+            space for the data set. Use None if no extra dimensions are use.
         """
         if(self.data_converter is not None and
            self.obj.data_format is not None):
