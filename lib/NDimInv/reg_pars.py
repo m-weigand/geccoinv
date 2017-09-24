@@ -1,5 +1,5 @@
 # *-* coding: utf-8 *-*
-"""
+r"""
 initial :math:`\lambda` value :math:`\lambda_0`
 -----------------------------------------------
 
@@ -144,8 +144,13 @@ class Lcurve(object):
         # save data to text files
         header = '# lambda Rm RMS\n'
         output_data = np.vstack((test_lams, test_Rm, rms_values)).T
-        with open(filename + '.dat', 'w') as fid:
-            fid.write(header)
+        with open(filename + '.dat', 'wb') as fid:
+            fid.write(
+                bytes(
+                    header,
+                    'utf-8',
+                )
+            )
             np.savetxt(fid, output_data)
 
     def _sample_lambdas(self, it, WtWms, lams, lam_index):
