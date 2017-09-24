@@ -350,8 +350,8 @@ class SearchLambda(BaseLambda):
 
         minimal_lambda_index = np.argmin(rms_values)
         best_lam = test_lams[minimal_lambda_index]
-        logging.info('all lambdas', test_lams)
-        logging.info('optimal lambda', best_lam)
+        logging.info('all lambdas {0}'.format(test_lams))
+        logging.info('optimal lambda {0}'.format(best_lam))
 
         return best_lam
 
