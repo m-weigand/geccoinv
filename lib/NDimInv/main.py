@@ -66,7 +66,7 @@ class RMS_control(object):
                rms values.
         """
         if key in self.rms_types:
-            print('WARNING: Duplicate RMS definition: {0}'.format(key))
+            logging.info('WARNING: Duplicate RMS definition: {0}'.format(key))
         self.rms_types[key] = definition
         self.rms_names[key] = names
 
@@ -239,8 +239,10 @@ class SearchSteplengthParFit(object):
                 pass
 
         if(len(rms_values) != 3):
-            print('Not all steplengths could be calculated. ' +
-                  'Cannot fit parabola')
+            logging.info(
+                'Not all steplengths could be calculated. ' +
+                'Cannot fit parabola'
+            )
             return None
 
         # fit parabola
@@ -352,11 +354,13 @@ class SearchSteplength(object):
             except FloatingPointError:
                 pass
         if(best_index == -1):
-            print('All tested steplengths caused exceptions. Somethings ' +
-                  'really wrong here')
+            logging.info(
+                'All tested steplengths caused exceptions. Somethings ' +
+                'really wrong here'
+            )
             return None
 
-        print('Found an optimal steplength ({0}) with rms {1} '.format(
+        logging.info('Found an optimal steplength ({0}) with rms {1} '.format(
             self.values[nr], best_rms) + '(old rms: {0})'.format(
             old_rms[self.rms_key][self.rms_index]))
         best_value = self.values[best_index]
@@ -417,7 +421,7 @@ class InversionControl(object):
         while(stop_now is False and
               not self.stop_before_next_iteration() and
               self.iterations[-1].nr < self.settings['max_iterations']):
-            print('Iteration: {0}'.format(self.iterations[-1].nr + 1))
+            logging.info('Iteration: {0}'.format(self.iterations[-1].nr + 1))
 
             new_iteration, stop_now = self.iterations[-1].next_iteration()
 
@@ -460,20 +464,24 @@ class InversionControl(object):
             if(nr == 0):
                 increase = (new_rms - old_rms)
                 if(increase > allowed_rms_im_increase_first_iteration):
-                    print('First iteration RMS-IM increase lies above: ' +
-                          '{0}'.format(
-                              allowed_rms_im_increase_first_iteration))
+                    logging.info(
+                        'First iteration RMS-IM increase lies above: ' +
+                        '{0}'.format(
+                            allowed_rms_im_increase_first_iteration
+                        )
+                    )
                     return True
             else:
                 # in all other cases: we do not allow an increase in rms
-                print('RMS Increase')
+                logging.info('RMS Increase')
                 return True
 
         # stop of the rms increase does not lie above a certain threshold
         rms_diff = np.abs(new_rms - old_rms)
         if(rms_diff < rms_upd_eps):
-            print('RMS update below threshold: {0} - {1} < {2}'.format(
-                new_rms, old_rms, rms_upd_eps))
+            logging.info('RMS update below threshold: {0} - {1} < {2}'.format(
+                new_rms, old_rms, rms_upd_eps
+            ))
             return True
 
         return False
@@ -582,7 +590,7 @@ class Inversion(RMS):
             elif(solver_id == 'cg'):
                 solve_func = SL.cg
             else:
-                print('ERROR: Solver not known: {0}'.format(solver_id))
+                logging.info('ERROR: Solver not known: {0}'.format(solver_id))
                 exit()
         else:
             solve_func = SL.spsolve
@@ -693,7 +701,7 @@ class Iteration(Inversion):
 
             output_filename += filename + '{0:04}.png'.format(self.nr)
 
-            fig.savefig(filename, dpi=150)
+            fig.savefig(output_filename, dpi=150)
             fig.clf()
             plt.close(fig)
         else:
@@ -889,12 +897,11 @@ class Iteration(Inversion):
         # save plot data
         np.savetxt(outfile + '.dat', reg_strength_lam)
 
-    def plot_lcurve(self):
-        """
-        plot the L-curve after hansen
+    def plot_lcurve(self, write_output=False):
+        """ plot the L-curve after Hansen
         """
 
-        print('Plotting l-curve for iteration {0}'.format(self.nr))
+        logging.info('Plotting l-curve for iteration {0}'.format(self.nr))
         if('global_prefix' in self.Model.obj.settings):
             output_prefix = self.Model.obj.settings['global_prefix']
         else:
@@ -903,10 +910,33 @@ class Iteration(Inversion):
         LCURVE = reg_pars.Lcurve()
         lams, WtWms = self.Model.retrieve_lams_and_WtWms(self)
 
+        figs = []
+        outputs = []
         for lam_index in range(0, len(lams)):
             prefix = output_prefix + 'lam-nr_{0}_'.format(lam_index)
-            LCURVE.plot_lcurve(self, WtWms, lams, lam_index, prefix)
+            fig, output = LCURVE.plot_lcurve(
+                self, WtWms, lams, lam_index, prefix
+            )
+            figs.append(fig)
+            outputs.append(output)
+            if write_output:
+                logging.info('saving lcruve to file')
+                filename = prefix + 'l-curve-nr_{0}'.format(self.nr)
+                fig.savefig(filename + '.png')
+
+                # save data to text files
+                header = '# lambda Rm RMS\n'
+                with open(filename + '.dat', 'wb') as fid:
+                    fid.write(
+                        bytes(
+                            header,
+                            'utf-8',
+                        )
+                    )
+                    np.savetxt(fid, output)
+
             lam_index += 1
+        return figs, outputs
 
 
 class NDimInv(InversionControl):
@@ -961,7 +991,7 @@ class NDimInv(InversionControl):
         required_settings = ('max_iterations', )
         for requirement in required_settings:
             if(requirement not in self.settings):
-                print('NDimInv: Missing required setting {0}'.format(
+                logging.info('NDimInv: Missing required setting {0}'.format(
                     requirement))
                 exit()
 
@@ -1038,20 +1068,24 @@ class NDimInv(InversionControl):
         """ Print information regarding a dimension dict (e.g. base or extra)
         """
         for key in dim_dict.keys():
-            print('{0} {1} [{2} values]'.format(key, dim_dict[key][0],
-                                                dim_dict[key][1]))
+            logging.info(
+                '{0} {1} [{2} values]'.format(
+                    key, dim_dict[key][0],
+                    dim_dict[key][1]
+                )
+            )
 
     def overview_data(self):
         """ Print information regarding the data space self.D
         """
-        print('\n\nDimension Information\n\n')
-        print('base dimensions')
-        print('---------------')
+        logging.info('\n\nDimension Information\n\n')
+        logging.info('base dimensions')
+        logging.info('---------------')
         self._print_data_dimension_information(self.Data.D_base_dims)
         if(self.Model is not None):
             self._print_data_dimension_information(self.Model.M_base_dims)
 
-        print('')
-        print('extra dimensions')
-        print('---------------')
+        logging.info('')
+        logging.info('extra dimensions')
+        logging.info('---------------')
         self._print_data_dimension_information(self.extra_dims)

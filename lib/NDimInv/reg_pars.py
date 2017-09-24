@@ -104,8 +104,7 @@ class BaseLambda(object):
 
 
 class Lcurve(object):
-    """
-    Create an L-curve for a given iteration.
+    """ Create an L-curve for a given iteration.
 
     WARNING: This is not yet a finalized regulariazion object for use as an
     regularization object. For now it is used to plot the l-curve for the given
@@ -117,6 +116,17 @@ class Lcurve(object):
         self.rms_index = 1
 
     def plot_lcurve(self, it, WtWms, lams, lam_index, output_prefix):
+        """
+        Parameters
+        ----------
+
+
+        Returns
+        -------
+        fig
+
+
+        """
         rms_values, test_Rm, test_lams = self._sample_lambdas(it, WtWms, lams,
                                                               lam_index)
         print('rms_values', rms_values)
@@ -138,20 +148,10 @@ class Lcurve(object):
         ax.set_xlabel('RMS value: {0}'.format(self.rms_key.replace('_', '\_')))
         ax.set_ylabel(r'$\left| R \cdot m \right|$')
         ax.set_title('L-Curve based on iteration {0}'.format(it.nr))
-        filename = output_prefix + 'l-curve-nr_{0}'.format(it.nr)
-        fig.savefig(filename + '.png')
 
         # save data to text files
-        header = '# lambda Rm RMS\n'
         output_data = np.vstack((test_lams, test_Rm, rms_values)).T
-        with open(filename + '.dat', 'wb') as fid:
-            fid.write(
-                bytes(
-                    header,
-                    'utf-8',
-                )
-            )
-            np.savetxt(fid, output_data)
+        return fig, output_data
 
     def _sample_lambdas(self, it, WtWms, lams, lam_index):
         # these are the lambda values we will test
@@ -196,6 +196,12 @@ class Lcurve(object):
         rms_values = [x.rms_values[self.rms_key][self.rms_index]
                       for x in test_its]
 
+        # remove nan values
+        indices = np.where(np.isinf(rms_values))[0]
+        for i in indices[::-1]:
+            del(rms_values[i])
+            del(test_Rm[i])
+            del(test_lams[i])
         return rms_values, test_Rm, test_lams
 
     def _get_lambda(self, it, WtWm, lam_index):
