@@ -838,7 +838,7 @@ class Iteration(Inversion):
             m.mean(), np.nanmax(m)))
 
     # @profile
-    def plot_reg_strengths(self):
+    def plot_reg_strengths(self, plot_to_file=False):
         r"""
         For each registered regularisation, plot :math:`\lambda_i \underline{
         \underline{W}}^T \underline{\underline{W}} \cdot \underline{m}` vs
@@ -889,13 +889,17 @@ class Iteration(Inversion):
 
         self.plot_reg_strengths1(axes[-2], axes[-1])
         fig.tight_layout()
-        fig.savefig(outfile + '.png')
-        fig.clf()
-        plt.close(fig)
-        del(fig)
 
-        # save plot data
-        np.savetxt(outfile + '.dat', reg_strength_lam)
+        if plot_to_file is True:
+            fig.savefig(outfile + '.png')
+            fig.clf()
+            plt.close(fig)
+            del(fig)
+
+            # save plot data
+            np.savetxt(outfile + '.dat', reg_strength_lam)
+        else:
+            return fig, reg_strength_lam
 
     def plot_lcurve(self, write_output=False):
         """ plot the L-curve after Hansen
