@@ -153,6 +153,7 @@ def plot_elements_to_file(output, cid, scale='linear'):
     fig.clf()
     plot_element_data(cid, 111, scale)
     plt.savefig(output, dpi=300, bbox_inches='tight')
+    plt.close()
 
 
 def plot_nodes_to_file(output, cid, fill_contours=True, levels=None):
@@ -162,6 +163,7 @@ def plot_nodes_to_file(output, cid, fill_contours=True, levels=None):
     fig.clf()
     plot_node_data(cid, 111, fill_contours, levels)
     plt.savefig(output, dpi=300, bbox_inches='tight')
+    plt.close()
 
 
 def plot_element_data(cid, subplot_id, scale='linear'):

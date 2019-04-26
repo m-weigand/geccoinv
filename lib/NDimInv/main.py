@@ -684,6 +684,11 @@ class Iteration(Inversion):
         self.statpars = None
 
     def plot(self, filename=None, **kwargs):
+        """Plot this iteration. Note that this function is basically a wrapper
+        around either self._plot_default(), or, if set,
+        self.Model.custom_plot_func.plot. This wrapper then takes care of
+        saving the file to disc, but only if a filename was given.
+        """
         fig = None
         if self.Model.custom_plot_func is None:
             fig = self._plot_default()
@@ -927,6 +932,7 @@ class Iteration(Inversion):
                 logging.info('saving lcruve to file')
                 filename = prefix + 'l-curve-nr_{0}'.format(self.nr)
                 fig.savefig(filename + '.png')
+                plt.close(fig)
 
                 # save data to text files
                 header = '# lambda Rm RMS\n'
