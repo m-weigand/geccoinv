@@ -10,7 +10,7 @@ import sys
 
 # TODO: understand the inclusion of requirements
 version_short = '0.8'
-version_long = '0.8.6'
+version_long = '0.8.7.dev0'
 
 extra = {}
 if sys.version_info >= (3,):
