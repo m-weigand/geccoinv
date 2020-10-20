@@ -1,4 +1,4 @@
-""" Copyright 2014-2017 Maximilian Weigand
+""" Copyright 2014-2020 Maximilian Weigand
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -24,9 +24,9 @@ import numpy as np
 import ND_Model
 import ND_Data
 import NDimInv.plot_helper
-plt, mpl = NDimInv.plot_helper.setup()
 import NDimInv.reg_pars as reg_pars
 import NDimInv.helper as helper
+plt, mpl = NDimInv.plot_helper.setup()
 helper
 log = logging.getLogger(__name__)
 
@@ -619,8 +619,7 @@ class Inversion(RMS):
         self._update_dict['WtWms'] = WtWms
 
     def _model_update(self, lams, WtWms):
-        """
-        Compute the actual model update with the regularisations provided
+        r""" Compute the actual model update with the regularizations provided
 
         Parameters
         ----------
@@ -771,6 +770,9 @@ class Iteration(Inversion):
         """ Aggregate statistical parameters for this iteration and return a
         dictionary
         """
+        if self.statpars is not None:
+            return self.statpars
+
         self.statpars = {}
         # loop over the m instances (i.e. the base dimensions)
         parsize = self.Model.M_base_dims[0][1]
