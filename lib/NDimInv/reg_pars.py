@@ -66,7 +66,7 @@ class Lam0_AtWtWA(object):
         Determine the initial lambda value based on
 
         - Newman and Alaumbaugh, 1997
-        - Kemna, 2000 (p.76)
+        - Kemna, 2000 (p.67)
 
         by using the mean value of the diagonal entries of A^T W_d^T D_d A
         """
