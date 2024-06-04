@@ -11,7 +11,6 @@ def print_visual_mul(W):
     row * column
     """
     for row in W:
-        #print row
         expression = ''
         for par in range(0, row.size):
             if(row[par] != 0):
@@ -34,6 +33,6 @@ def print_visual_mul(W):
 
 def print_reg_mat(W):
     Wsquared = W.T.dot(W)
-    print W
-    print Wsquared
+    print(W)
+    print(Wsquared)
     print_visual_mul(Wsquared)
