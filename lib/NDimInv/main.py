@@ -703,9 +703,16 @@ class Iteration(Inversion):
             else:
                 pass
 
-            output_filename += filename + '{0:04}.png'.format(self.nr)
+            output_filename += filename + '{0:04}.jpg'.format(self.nr)
 
-            fig.savefig(output_filename, dpi=150)
+            fig.savefig(output_filename, dpi=300)
+
+            # reset the xaxis scale to linear to prevent warning messages
+            # see:
+            # https://github.com/matplotlib/matplotlib/issues/9970
+            for ax in fig.get_axes():
+                ax.set_xscale('linear')
+
             fig.clf()
             plt.close(fig)
         else:
