@@ -21,8 +21,8 @@ import scipy.sparse as sparse
 import scipy.sparse.linalg as SL
 import numpy as np
 
-import ND_Model
-import ND_Data
+import NDimInv.ND_Model as ND_Model
+import NDimInv.ND_Data as ND_Data
 import NDimInv.plot_helper
 import NDimInv.reg_pars as reg_pars
 import NDimInv.helper as helper
@@ -113,7 +113,7 @@ class RMS(object):
         diff_err_sq = diff_err ** 2
 
         rms_values = {}
-        for key, item in self.RMS.rms_types.iteritems():
+        for key, item in self.RMS.rms_types.items():
             # determine which dimensions to sum up
             full_item = np.array(item + [True, ] * (len(D.shape) - len(item)))
             indices = np.where(full_item)[0]
@@ -183,7 +183,7 @@ class RMS(object):
         Split the provided vector into the two basic parts (re/im| mag/pha).
         This corresponds to a split in dimension 1
         """
-        if(self.Data.extra_mask is None):
+        if (self.Data.extra_mask is None):
             Dsize = self.Data.D.shape
         else:
             Dsize = self.Data.D_base_size
@@ -238,7 +238,7 @@ class SearchSteplengthParFit(object):
             except ArithmeticError:
                 pass
 
-        if(len(rms_values) != 3):
+        if (len(rms_values) != 3):
             logging.info(
                 'Not all steplengths could be calculated. ' +
                 'Cannot fit parabola'
@@ -249,7 +249,7 @@ class SearchSteplengthParFit(object):
         x = np.array(alpha_values)
         y = np.array(rms_values)
 
-        A = np.zeros((3, 3), dtype=np.float)
+        A = np.zeros((3, 3), dtype=np.float64)
         A[:, 0] = x ** 2
         A[:, 1] = x
         A[:, 2] = 1
@@ -259,16 +259,16 @@ class SearchSteplengthParFit(object):
         x_min = -b / (2 * a)
 
         # we need to make sure to lie in the range ]0, 1]
-        if(x_min > 1):
+        if (x_min > 1):
             x_min = 1
 
         # use a default here, the inversion will probably end if we do not
         # improve the rms
-        if(x_min <= 0):
+        if (x_min <= 0):
             x_min = 0.1
 
         # debug plots
-        if(False):
+        if False:
             fig, ax = plt.subplots(1, 1)
             ax.plot(x, y, '.')
             ax.set_xlabel('alpha')
@@ -276,7 +276,7 @@ class SearchSteplengthParFit(object):
             x_dense = np.linspace(0, 1, 30)
             ax.plot(x_dense, a * (x_dense ** 2) + b * x_dense + c, '-')
             ax.axvline(x_min)
-            if('global_prefix' in it.Model.obj.settings):
+            if ('global_prefix' in it.Model.obj.settings):
                 output_prefix = it.Model.obj.settings['global_prefix']
             else:
                 output_prefix = ""
@@ -284,7 +284,7 @@ class SearchSteplengthParFit(object):
             fig.savefig(filename + '.png')
             fig.clf()
             plt.close(fig)
-            del(fig)
+            del (fig)
         return x_min
 
 
@@ -304,7 +304,7 @@ class SearchSteplength(object):
         rms_key: RMS dict key to optimize
         rms_index: index for the provided RMS key
         """
-        if(fixed_values is None):
+        if (fixed_values is None):
             # 1e-5, 1e-4
             self.values = (1e-3, 1e-2, 0.1, 0.5, 1)
         else:
@@ -343,17 +343,17 @@ class SearchSteplength(object):
             try:
                 test_rms = it_test.rms_values
 
-                if(best_index == -1):
+                if (best_index == -1):
                     best_index = nr
                     best_rms = test_rms[self.rms_key][self.rms_index]
                 else:
-                    if(old_rms[self.rms_key][self.rms_index] >
+                    if (old_rms[self.rms_key][self.rms_index] >
                        test_rms[self.rms_key][self.rms_index]):
                         best_index = nr
                         best_rms = test_rms[self.rms_key][self.rms_index]
             except FloatingPointError:
                 pass
-        if(best_index == -1):
+        if (best_index == -1):
             logging.info(
                 'All tested steplengths caused exceptions. Somethings ' +
                 'really wrong here'
@@ -414,23 +414,23 @@ class InversionControl(object):
         all iterations. This function also checks stopping criteria
         """
         log.info('Running inversion')
-        if(self.iterations == []):
+        if (self.iterations == []):
             self.start_inversion()
         # self.iterations[-1].plot()
         stop_now = False
-        while(stop_now is False and
-              not self.stop_before_next_iteration() and
-              self.iterations[-1].nr < self.settings['max_iterations']):
+        while (stop_now is False and
+                not self.stop_before_next_iteration() and
+                self.iterations[-1].nr < self.settings['max_iterations']):
             logging.info('Iteration: {0}'.format(self.iterations[-1].nr + 1))
 
             new_iteration, stop_now = self.iterations[-1].next_iteration()
 
             # self.iterations[-1].plot()
-            if(not stop_now):
+            if (not stop_now):
                 stop_now = self.check_stopping_criteria_before_update(
                     new_iteration)
 
-            if(stop_now is False):
+            if (stop_now is False):
                 self.iterations.append(new_iteration)
 
     def check_stopping_criteria_before_update(self, new_it):
@@ -460,10 +460,10 @@ class InversionControl(object):
         # if we are in the first iteration, then we allow a slight increase in
         # the imaginary RMS, but not above a certain threshold
         # TODO: Perhaps this threshold should be in RMS?
-        if(new_rms > old_rms):
-            if(nr == 0):
+        if (new_rms > old_rms):
+            if (nr == 0):
                 increase = (new_rms - old_rms)
-                if(increase > allowed_rms_im_increase_first_iteration):
+                if (increase > allowed_rms_im_increase_first_iteration):
                     logging.info(
                         'First iteration RMS-IM increase lies above: ' +
                         '{0}'.format(
@@ -478,7 +478,7 @@ class InversionControl(object):
 
         # stop of the rms increase does not lie above a certain threshold
         rms_diff = np.abs(new_rms - old_rms)
-        if(rms_diff < rms_upd_eps):
+        if (rms_diff < rms_upd_eps):
             logging.info('RMS update below threshold: {0} - {1} < {2}'.format(
                 new_rms, old_rms, rms_upd_eps
             ))
@@ -548,7 +548,7 @@ class Inversion(RMS):
 
         alpha = self.Model.steplength_selector.get_steplength(self, update_m)
         self._update_dict['alpha'] = alpha
-        if(alpha is None):
+        if (alpha is None):
             return None, True
         new_iteration.m = self.m + alpha * update_m
         new_iteration.f = self.Model.f(new_iteration.m)
@@ -563,7 +563,7 @@ class Inversion(RMS):
         for lam, WtWm in zip(lams, WtWms):
             WtWm_sparse = sparse.csc_matrix(WtWm)
 
-            if(type(lam) is not int and not isinstance(lam, float)):
+            if (type(lam) is not int and not isinstance(lam, float)):
                 A = A + lam.dot(WtWm_sparse)
                 b = b - lam.dot(WtWm_sparse).dot(self.m)
             else:
@@ -583,11 +583,11 @@ class Inversion(RMS):
             *  std: use scipy.sparse.linalg.spsolve
             *  cg: use scipy.sparse.linalg.cg (sparse conjugate gradient)
         """
-        if('DD_SOLVER' in os.environ):
+        if ('DD_SOLVER' in os.environ):
             solver_id = os.environ['DD_SOLVER']
-            if(solver_id == 'std'):
+            if (solver_id == 'std'):
                 solve_func = SL.spsolve
-            elif(solver_id == 'cg'):
+            elif (solver_id == 'cg'):
                 solve_func = SL.cg
             else:
                 logging.info('ERROR: Solver not known: {0}'.format(solver_id))
@@ -648,7 +648,7 @@ class Inversion(RMS):
 
         # sometimes we get a list, in this instance take only the first element
         # see documentation for the solver functions
-        if(isinstance(update_m, tuple)):
+        if (isinstance(update_m, tuple)):
             update_m = update_m[0]
         self._update_dict['update'] = update_m
         return update_m
@@ -698,7 +698,7 @@ class Iteration(Inversion):
 
         if filename is not None:
             output_filename = "plot_"
-            if('global_prefix' in self.Model.obj.settings):
+            if ('global_prefix' in self.Model.obj.settings):
                 output_filename += self.Model.obj.settings['global_prefix']
             else:
                 pass
@@ -780,8 +780,8 @@ class Iteration(Inversion):
             one_parset = self.m[index: index + parsize]
             single_par_stats = self.Model.obj.compute_par_stats(one_parset)
             # now sort into self.statpars
-            for key, item in single_par_stats.iteritems():
-                if(key not in self.statpars):
+            for key, item in single_par_stats.items():
+                if (key not in self.statpars):
                     self.statpars[key] = []
                 self.statpars[key].append(item)
 
@@ -817,7 +817,7 @@ class Iteration(Inversion):
         for i in range(0, rho0.size, size_m + 1):
             ax1.axvline(x=i, color='k', linestyle='dashed', linewidth=0.5)
 
-        if('DD_USE_LATEX' in os.environ and
+        if ('DD_USE_LATEX' in os.environ and
            os.environ['DD_USE_LATEX'] == '1'):
             ylabel_base = r'\left[\underline{\underline{J}}^T '
             ylabel_base += r'\underline{\underline{W}}_d^T '
@@ -851,7 +851,7 @@ class Iteration(Inversion):
         \underline{W}}^T \underline{\underline{W}} \cdot \underline{m}` vs
         :math:`\underline{m}`
         """
-        if('global_prefix' in self.Model.obj.settings):
+        if ('global_prefix' in self.Model.obj.settings):
             output_prefix = self.Model.obj.settings['global_prefix']
         else:
             output_prefix = ""
@@ -866,7 +866,7 @@ class Iteration(Inversion):
             ax = np.atleast_1d(axes)[reg_index]
             reg_strength = WtWm.dot(self.m)
             mean_strength = np.mean(reg_strength)
-            if(isinstance(lam, (int, float))):
+            if (isinstance(lam, (int, float))):
                 reg_strength_lam = lam * reg_strength
                 lam_value = lam
             else:
@@ -881,7 +881,7 @@ class Iteration(Inversion):
                 ax.axvline(x=i, color='k', linestyle='dashed', linewidth=0.5)
             ax.set_xlim([0, len(reg_strength)])
             ax.set_xlabel('Parameter number')
-            if('DD_USE_LATEX' in os.environ and
+            if ('DD_USE_LATEX' in os.environ and
                os.environ['DD_USE_LATEX'] == '1'):
                 ylabel = r''.join((
                     r'$\lambda \cdot \underline{\underline{W}}^T ',
@@ -901,7 +901,7 @@ class Iteration(Inversion):
             fig.savefig(outfile + '.png')
             fig.clf()
             plt.close(fig)
-            del(fig)
+            del (fig)
 
             # save plot data
             np.savetxt(outfile + '.dat', reg_strength_lam)
@@ -913,7 +913,7 @@ class Iteration(Inversion):
         """
 
         logging.info('Plotting l-curve for iteration {0}'.format(self.nr))
-        if('global_prefix' in self.Model.obj.settings):
+        if ('global_prefix' in self.Model.obj.settings):
             output_prefix = self.Model.obj.settings['global_prefix']
         else:
             output_prefix = ""
@@ -1002,7 +1002,7 @@ class NDimInv(InversionControl):
         """
         required_settings = ('max_iterations', )
         for requirement in required_settings:
-            if(requirement not in self.settings):
+            if (requirement not in self.settings):
                 logging.info('NDimInv: Missing required setting {0}'.format(
                     requirement))
                 exit()
@@ -1094,7 +1094,7 @@ class NDimInv(InversionControl):
         logging.info('base dimensions')
         logging.info('---------------')
         self._print_data_dimension_information(self.Data.D_base_dims)
-        if(self.Model is not None):
+        if (self.Model is not None):
             self._print_data_dimension_information(self.Model.M_base_dims)
 
         logging.info('')
