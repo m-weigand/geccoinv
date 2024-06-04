@@ -135,7 +135,7 @@ class ND_Model(object):
         return offset
 
     def map_reg_matrix_to_global_Wm(self, dim, func, outside_first_dim):
-        """
+        r"""
         Assemble the regularization matrix of one regularization function of
         the N dimensional problem. Depending on the function pointer that is
         provided, this can be either :math:`W_m^T \cdot W_m` or just
@@ -162,7 +162,7 @@ class ND_Model(object):
         new_size[0], new_size[dim] = new_size[dim], new_size[0]
 
         # store changed order
-        dim_order = range(0, len(Msize))
+        dim_order = list(range(0, len(Msize)))
         dim_order[0] = dim
         dim_order[dim] = 0
 
@@ -280,10 +280,10 @@ class ND_Model(object):
         """
         get numbers of values for each dimension
         """
-        sizes = [x[1][1] for x in self.M_base_dims.iteritems()]
+        sizes = [x[1][1] for x in self.M_base_dims.items()]
 
         if(self.Data.extra_mask is None):
-            sizes += [x[1][1] for x in self.extra_dims.iteritems()]
+            sizes += [x[1][1] for x in self.extra_dims.items()]
         return sizes
 
     def convert_to_M(self, m):
