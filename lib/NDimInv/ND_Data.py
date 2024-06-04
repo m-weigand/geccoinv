@@ -44,7 +44,7 @@ class ND_Data(object):
         self.extra_dims = extra_dims
 
         self.dimensions = self.D_base_dims.copy()
-        for key, item in self.extra_dims.iteritems():
+        for key, item in self.extra_dims.items():
             self.dimensions[key + len(self.D_base_size)] = item
 
         self._base_length = None
@@ -95,7 +95,7 @@ class ND_Data(object):
         This function provides the slices in the same order as an oder='F'
         argument for .flatten().
         """
-        all_indices = [range(0, x[1][1]) for x in self.extra_dims.iteritems()]
+        all_indices = [range(0, x[1][1]) for x in self.extra_dims.items()]
         extra_indices = itertools.product(*all_indices)
 
         # create slices for the base dimensions, corresponds to a list of ':'
@@ -149,7 +149,7 @@ class ND_Data(object):
         """ Return the length of the base dimensions in a flattened state
         """
         if(self._base_length is None):
-            lengths = [x[1][1] for x in self.D_base_dims.iteritems()]
+            lengths = [x[1][1] for x in self.D_base_dims.items()]
             base_length = 1
             for item in lengths:
                 base_length *= item
@@ -213,7 +213,7 @@ class ND_Data(object):
         # dimensions
         # see:
         # file:///usr/share/doc/python-numpy-doc/html/user/basics.indexing.html
-        index = [slice(0, x[1][1]) for x in self.D_base_dims.iteritems()]
+        index = [slice(0, x[1][1]) for x in self.D_base_dims.items()]
         index += extra
         index = tuple(index)
 
