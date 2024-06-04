@@ -281,7 +281,7 @@ class SearchSteplengthParFit(object):
             else:
                 output_prefix = ""
             filename = output_prefix + 'steplength_parbola_it{0}'.format(it.nr)
-            fig.savefig(filename + '.png')
+            fig.savefig(filename + '.jpg', dpi=300)
             fig.clf()
             plt.close(fig)
             del (fig)
@@ -898,7 +898,7 @@ class Iteration(Inversion):
         fig.tight_layout()
 
         if plot_to_file is True:
-            fig.savefig(outfile + '.png')
+            fig.savefig(outfile + '.jpg', dpi=300)
             fig.clf()
             plt.close(fig)
             del (fig)
@@ -933,7 +933,7 @@ class Iteration(Inversion):
             if write_output:
                 logging.info('saving lcruve to file')
                 filename = prefix + 'l-curve-nr_{0}'.format(self.nr)
-                fig.savefig(filename + '.png')
+                fig.savefig(filename + '.jpg', dpi=300)
                 plt.close(fig)
 
                 # save data to text files
