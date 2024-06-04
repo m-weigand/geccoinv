@@ -13,9 +13,6 @@ version_short = '0.8'
 version_long = '0.8.7.dev0'
 
 extra = {}
-if sys.version_info >= (3,):
-    print('V3')
-    extra['use_2to3'] = True
 
 if __name__ == '__main__':
     setup(name='geccoinv',
